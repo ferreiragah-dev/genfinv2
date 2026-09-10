@@ -1,0 +1,103 @@
+.table-card {
+  padding: 0;
+  overflow: hidden;
+}
+.table-card .card-heading {
+  padding: 22px 23px 0;
+  margin-bottom: 20px;
+}
+.table-scroll {
+  overflow-x: auto;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  white-space: nowrap;
+}
+.table th {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--subtle);
+  padding: 11px 20px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: #05070d26;
+}
+.table td {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--muted);
+}
+.table tr:last-child td {
+  border-bottom: 0;
+}
+.table tbody tr {
+  transition: background var(--transition);
+}
+.table tbody tr:hover {
+  background: #94a3b805;
+}
+.table .transaction-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+  font-weight: 500;
+}
+.table .transaction-name p {
+  font-size: 10px;
+  color: var(--subtle);
+  font-weight: 400;
+  margin-top: 2px;
+}
+.transaction-symbol {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--primary-soft);
+  color: #94afff;
+  font-size: 12px;
+}
+.transaction-symbol.income {
+  background: var(--success-soft);
+  color: #4cda85;
+}
+.transaction-symbol.expense {
+  background: #a78bfa12;
+  color: #b09ae1;
+}
+.table td.amount-income {
+  color: #4cda85;
+  font-weight: 500;
+}
+.table td.amount-expense {
+  color: #e2e8f0;
+  font-weight: 500;
+}
+.table-footer {
+  border-top: 1px solid var(--border);
+  padding: 14px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--subtle);
+  font-size: 11px;
+}
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.table .row-actions {
+  display: flex;
+  gap: 3px;
+}
+.table .icon-button {
+  height: 28px;
+  width: 28px;
+  font-size: 11px;
+}

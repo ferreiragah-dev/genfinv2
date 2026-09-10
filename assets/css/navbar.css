@@ -1,0 +1,123 @@
+.navbar {
+  height: var(--navbar-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 36px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(5, 7, 13, 0.8);
+  backdrop-filter: blur(20px);
+  gap: 16px;
+}
+.breadcrumbs {
+  display: flex;
+  gap: 13px;
+  align-items: center;
+  color: var(--subtle);
+  font-size: 12px;
+}
+.breadcrumbs span:last-child {
+  color: #cbd5e1;
+}
+.breadcrumbs .fa-chevron-right {
+  font-size: 8px;
+}
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+}
+.search-trigger {
+  background: none;
+  border: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--subtle);
+  font-size: 12px;
+  padding: 8px 0;
+}
+.search-trigger kbd {
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-family: inherit;
+  font-size: 10px;
+  margin-left: 40px;
+}
+.icon-button {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  display: inline-grid;
+  place-items: center;
+  color: var(--muted);
+  position: relative;
+  transition: background var(--transition);
+}
+.icon-button:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+.notification-dot {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  width: 5px;
+  height: 5px;
+  background: var(--primary);
+  border: 1px solid var(--bg);
+  border-radius: 100%;
+}
+.avatar {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(140deg, #345eaa, #182a4e);
+  color: #d9e5ff;
+  font-size: 11px;
+  font-weight: 600;
+}
+.avatar-lg {
+  width: 80px;
+  height: 80px;
+  font-size: 28px;
+}
+.notification-wrap {
+  position: relative;
+}
+.notification-panel {
+  position: absolute;
+  top: 48px;
+  right: 0;
+  width: 350px;
+  z-index: 60;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+}
+.notification-panel .card-heading {
+  margin-bottom: 16px;
+}
+.notification-item {
+  padding: 14px 0;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 12px;
+}
+.notification-item i {
+  color: var(--warning);
+  padding-top: 4px;
+}
+.notification-item p {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+}

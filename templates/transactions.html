@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load finance_tags %}
+{% block content %}
+  <div class="page-header">
+    <div>
+      <p class="eyebrow" style="margin-bottom:8px">CADA MOVIMENTO IMPORTA</p>
+      <h1>Transações</h1>
+      <p class="page-subtitle">Seu dinheiro em movimento, sem perder nenhum detalhe.</p>
+    </div>
+    <div class="header-actions">
+      <a class="button"
+         href="{% url 'export_transactions' %}?{{ query_params }}"><i class="fa-solid fa-download" aria-hidden="true"></i> Exportar</a>
+      <button class="button button-primary" data-new-transaction>
+        <i class="fa-solid fa-plus" aria-hidden="true"></i> Nova transação
+      </button>
+    </div>
+  </div>
+  <div class="grid grid-three" style="margin-bottom:24px">
+    {% include 'components/metric.html' with label='Receitas concluídas' value=income icon='arrow-down' tone='green' footnote='Dentro dos filtros selecionados' %}
+    {% include 'components/metric.html' with label='Despesas concluídas' value=expense icon='arrow-up' tone='red' footnote='Dentro dos filtros selecionados' %}
+    {% include 'components/metric.html' with label='Total pendente' value=pending_total icon='clock' tone='purple' footnote='Receitas e despesas a concluir' %}
+  </div>
+  <div class="toolbar">
+    <form class="inline" method="get">
+      <div class="search-field">
+        <label class="sr-only" for="tx-search">Pesquisar descrição</label>
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+        <input class="input"
+               type="search"
+               id="tx-search"
+               name="q"
+               value="{{ request.GET.q }}"
+               placeholder="Buscar transação...">
+      </div>
+      <label class="sr-only" for="filter-kind">Tipo</label>
+      <select class="select filter-select" name="kind" id="filter-kind">
+        <option value="">
+          Todos os tipos
+        </option value="income"
+        {% if request.GET.kind == 'income' %}selected{% endif %}
+        >
+        Receitas
+      </option>
+      <option value="expense"
+              {% if request.GET.kind == 'expense' %}selected{% endif %}>Despesas</option>
+    </select>
+    <label class="sr-only" for="filter-status">Status</label>
+    <select class="select filter-select" name="status" id="filter-status">
+      <option value="">Todos os status</option>
+      <option value="paid" {% if request.GET.status == 'paid' %}selected{% endif %}>Concluídos</option>
+      <option value="pending"
+              {% if request.GET.status == 'pending' %}selected{% endif %}>Pendentes</option>
+    </select>
+    <label class="sr-only" for="filter-month">Mês</label>
+    <input class="input filter-select"
+           type="month"
+           name="month"
+           id="filter-month"
+           value="{{ request.GET.month }}">
+    <button class="button" type="submit">
+      <i class="fa-solid fa-filter" aria-hidden="true"></i> Filtrar
+    </button>
+    {% if request.GET %}
+      <a class="text-link" href="{% url 'transactions' %}">Limpar</a>
+    {% endif %}
+  </form>
+</div>
+<section class="card table-card">
+  <div class="card-heading">
+    <h2>Todas as movimentações</h2>
+    <span class="badge badge-neutral">{{ count }} registros</span>
+  </div>
+  {% include 'components/transaction_table.html' %}
+  <div class="table-footer">
+    <span>
+      {% if count %}
+        {{ page_obj.start_index }}–{{ page_obj.end_index }} de {{ count }} transações
+      {% else %}
+        Nenhum registro
+      {% endif %}
+    </span>
+    <div class="pagination">
+      {% if page_obj.has_previous %}
+        <a class="button button-sm"
+           href="?{{ query_params }}&page={{ page_obj.previous_page_number }}"
+           aria-label="Página anterior"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></a>
+      {% endif %}
+      <span>{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}
+        <a class="button button-sm"
+           href="?{{ query_params }}&page={{ page_obj.next_page_number }}"
+           aria-label="Próxima página"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

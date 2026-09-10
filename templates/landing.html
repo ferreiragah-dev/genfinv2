@@ -1,0 +1,145 @@
+{% extends 'document.html' %}
+{% load static %}
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+{% endblock %}
+{% block body %}
+  <div class="landing-shell">
+    <header class="landing-nav">
+      <a href="{% url 'landing' %}" class="brand"><span class="brand-mark"><span>g</span></span><span class="brand-name">gen<span>fin</span>.</span></a>
+      <nav class="inline" aria-label="Navegação do site">
+        <a href="#possibilidades">Possibilidades</a><a href="#como-funciona">Como funciona</a>
+      </nav>
+      <a href="{% url 'login' %}" class="button">Entrar <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+    </header>
+    <main id="main-content">
+      <section class="landing-hero">
+        <span class="badge badge-outline"><span class="status-dot"></span> Seu dinheiro merece uma visão melhor</span>
+        <h1>
+          Menos planilhas.
+          <br>
+          Mais <span>vida nos seus planos.</span>
+        </h1>
+        <p>
+          Tudo o que você precisa para entender seu dinheiro.
+          <br>
+          Clareza para hoje. Liberdade para o que vem depois.
+        </p>
+        <div class="landing-cta">
+          <a href="{% url 'register' %}" class="button button-primary button-lg">Começar minha jornada <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+          <form action="{% url 'demo' %}" method="post">
+            {% csrf_token %}
+            <button class="button button-lg button-ghost" type="submit">
+              <i class="fa-solid fa-play" aria-hidden="true"></i> Explorar demonstração
+            </button>
+          </form>
+        </div>
+        <span class="small subtle">Seu espaço pessoal para organizar, acompanhar e planejar.</span>
+        <div class="landing-preview"
+             aria-label="Exemplo ilustrativo do planejamento no GenFin">
+          <div class="preview-toolbar">
+            <span class="inline"><i></i><i></i><i></i></span><span>Seu futuro, em perspectiva</span><i class="fa-solid fa-lock" aria-hidden="true"></i>
+          </div>
+          <div class="preview-body">
+            <div class="preview-main">
+              <p class="eyebrow">UM PLANO DE CADA VEZ</p>
+              <h2>O próximo capítulo é seu.</h2>
+              <p class="muted">
+                Dê nome aos seus sonhos.
+                <br>
+                Encontre espaço para realizá-los.
+              </p>
+              <div class="preview-metrics">
+                <div>
+                  <span class="small muted">Entenda</span><strong>Seu presente</strong>
+                </div>
+                <div>
+                  <span class="small muted">Construa</span><strong>Seu futuro</strong>
+                </div>
+              </div>
+            </div>
+            <div class="preview-goals">
+              <div class="goal">
+                <div class="inline">
+                  <span class="goal-icon"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i></span>
+                  <div>
+                    <h3>Mais tranquilidade</h3>
+                    <span class="small muted">Sua reserva de emergência</span>
+                  </div>
+                </div>
+                <div class="progress">
+                  <div class="progress-fill" style="--progress:72%"></div>
+                </div>
+              </div>
+              <div class="goal">
+                <div class="inline">
+                  <span class="goal-icon purple"><i class="fa-solid fa-plane" aria-hidden="true"></i></span>
+                  <div>
+                    <h3>Novas histórias</h3>
+                    <span class="small muted">Aquela viagem dos sonhos</span>
+                  </div>
+                </div>
+                <div class="progress">
+                  <div class="progress-fill purple" style="--progress:46%"></div>
+                </div>
+              </div>
+              <span class="small subtle">Planejamentos ilustrativos</span>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="landing-section" id="possibilidades">
+        <p class="eyebrow primary-text">TUDO SE CONECTA</p>
+        <h2>
+          Uma visão completa.
+          <br>
+          Uma relação mais leve com o dinheiro.
+        </h2>
+        <div class="grid grid-three">
+        <article class="card"><span class="metric-icon"><i class="fa-solid fa-chart-line" aria-hidden="true"></i></span>
+        <h3>Entenda cada movimento</h3>
+        <p>Receitas, despesas e categorias organizadas para você enxergar o que realmente importa.</p>
+      </article><article class="card"><span class="metric-icon purple"><i class="fa-solid fa-credit-card" aria-hidden="true"></i></span>
+      <h3>Antecipe o seu mês</h3>
+      <p>Tenha seus cartões e compromissos recorrentes à vista. Mais previsibilidade, menos surpresas.</p>
+    </article><article class="card"><span class="metric-icon green"><i class="fa-solid fa-bullseye" aria-hidden="true"></i></span>
+    <h3>Dê espaço aos seus planos</h3>
+    <p>Reservas, viagens e patrimônio acompanhados no seu ritmo, com metas que fazem sentido para você.</p>
+  </article>
+</div>
+</section>
+<section class="landing-section landing-how" id="como-funciona">
+  <div>
+    <p class="eyebrow primary-text">SIMPLES DESDE O PRIMEIRO PASSO</p>
+    <h2>
+      Um pouco de atenção.
+      <br>
+      Muito mais clareza.
+    </h2>
+    <a href="{% url 'register' %}" class="button button-primary button-lg">Criar minha conta <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+  </div>
+  <div class="landing-steps">
+    <article><span>01</span>
+      <div>
+        <h3>Crie o seu espaço</h3>
+        <p>Comece com uma conta pessoal, pronta para a sua organização.</p>
+      </div>
+      </article><article><span>02</span>
+      <div>
+        <h3>Registre sua vida financeira</h3>
+        <p>Adicione movimentações, cartões e compromissos. Cada registro faz diferença.</p>
+      </div>
+      </article><article><span>03</span>
+      <div>
+        <h3>Acompanhe. Ajuste. Conquiste.</h3>
+        <p>Use sua visão geral para entender hábitos e aproximar seus próximos objetivos.</p>
+      </div>
+    </article>
+  </div>
+</section>
+</main>
+<footer class="landing-footer">
+  <a href="{% url 'landing' %}" class="brand"><span class="brand-mark"><span>g</span></span><span class="brand-name">gen<span>fin</span>.</span></a><span>Feito para a sua vida. No seu ritmo.</span><a href="{% url 'login' %}">Acessar minha conta <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+</footer>
+</div>
+{% endblock %}

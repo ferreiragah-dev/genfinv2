@@ -1,0 +1,89 @@
+{% extends 'portfolio_base.html' %}
+{% load finance_tags %}
+{% block portfolio_metrics_extra %}
+  {% include 'components/metric.html' with label='Custo dos veículos no mês' value=vehicle_month_total icon='receipt' tone='red' footnote=month_label %}
+{% endblock %}
+{% block portfolio_intro %}
+  <div class="toolbar">
+    <div>
+      <h2>Custos de {{ month_label|lower }}</h2>
+      <p class="small muted">
+        IPVA + seguro + combustível pagos no mês. Cada parcela entra na data do pagamento, sem rateio anual.
+      </p>
+    </div>
+    <form class="inline" method="get">
+      <label class="sr-only" for="vehicle-month">Mês dos custos</label>
+      <input class="input filter-select"
+             id="vehicle-month"
+             type="month"
+             name="month"
+             value="{{ month }}"
+             required>
+      <button class="button" type="submit">
+        <i class="fa-solid fa-filter" aria-hidden="true"></i> Aplicar
+      </button>
+    </form>
+  </div>
+  <p class="small muted" style="margin-bottom:20px">
+    Despesas antigas entram no resumo após selecionar a categoria e o veículo em <a class="primary-text" href="{% url 'transactions' %}">Transações</a>.
+  </p>
+{% endblock %}
+{% block portfolio_item_detail %}
+  <div class="vehicle-costs">
+    <div class="split">
+      <h3 class="small">Custo mensal</h3>
+      <strong class="mono" data-money>R$ {{ item.monthly_total|money }}</strong>
+    </div>
+    {% for cost in item.monthly_costs %}
+      <div class="vehicle-cost-row">
+        <span class="small muted"><i class="fa-solid fa-{{ cost.icon }}" aria-hidden="true"></i> {{ cost.label }}</span>
+        <span class="small mono" data-money>R$ {{ cost.amount|money }}</span>
+        <button class="icon-button"
+                data-new-transaction
+                data-vehicle="{{ item.pk }}"
+                data-category="{{ cost.category }}"
+                data-description="{{ cost.label }} · {{ item.name }}"
+                aria-label="Registrar {{ cost.label }} de {{ item.name }}">
+          <i class="fa-solid fa-plus" aria-hidden="true"></i>
+        </button>
+      </div>
+    {% endfor %}
+    <button class="button button-primary button-sm button-block"
+            data-new-transaction
+            data-vehicle="{{ item.pk }}"
+            data-category="Combustível"
+            data-description="Abastecimento · {{ item.name }}">
+      <i class="fa-solid fa-gas-pump" aria-hidden="true"></i> Registrar abastecimento
+    </button>
+  </div>
+{% endblock %}
+{% block portfolio_after %}
+  <section class="card table-card section-gap">
+    <div class="card-heading">
+      <div>
+        <h2>Despesas dos veículos</h2>
+        <p class="small muted">
+          {{ month_label }} · pendências aparecem no histórico e entram no custo ao serem concluídas.
+        </p>
+      </div>
+      <span class="badge badge-neutral">{{ vehicle_page.paginator.count }} registros</span>
+    </div>
+    {% include 'components/transaction_table.html' with recent=vehicle_page editable=True %}
+    <div class="table-footer">
+      <span>Os mesmos lançamentos de Transações, sem duplicação.</span>
+      <div class="pagination">
+        {% if vehicle_page.has_previous %}
+          <a class="button button-sm"
+             href="?month={{ month }}&page={{ vehicle_page.previous_page_number }}"
+             aria-label="Página anterior"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></a>
+        {% endif %}
+        <span>{{ vehicle_page.number }} / {{ vehicle_page.paginator.num_pages }}</span>
+        {% if vehicle_page.has_next %}
+          <a class="button button-sm"
+             href="?month={{ month }}&page={{ vehicle_page.next_page_number }}"
+             aria-label="Próxima página"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></a>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+{% endblock %}

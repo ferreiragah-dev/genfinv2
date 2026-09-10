@@ -1,0 +1,39 @@
+{% load finance_tags %}
+<button class="sidebar-overlay"
+        id="sidebar-overlay"
+        aria-label="Fechar navegação"
+        tabindex="-1"></button>
+<aside class="sidebar" id="sidebar" aria-label="Navegação principal">
+  <a href="{% url 'dashboard' %}"
+     class="brand"
+     aria-label="GenFin, início"><span class="brand-mark" aria-hidden="true"><span>g</span></span><span class="brand-name">gen<span>fin</span><span class="primary-text">.</span></span></a>
+  <a href="{% url 'profile' %}" class="workspace-switch"><span class="avatar">{{ user|initials }}</span><span><strong class="small">Espaço pessoal</strong><span class="subtle small" style="display:block;font-size:10px">Sua vida financeira</span></span><i class="fa-solid fa-chevron-down" aria-hidden="true"></i></a>
+  <p class="nav-label">PRINCIPAL</p>
+  <nav class="nav-list">
+    {% for key,label,icon,href in navigation %}
+      {% if forloop.counter == 6 %}<p class="nav-label nav-group">PLANEJAMENTO</p>{% endif %}
+      <a class="nav-link {% if page == key %}active{% endif %}"
+         href="{{ href }}"
+         {% if page == key %}aria-current="page"{% endif %}><i class="fa-solid fa-{{ icon }}" aria-hidden="true"></i>{{ label }}</a>
+    {% endfor %}
+  </nav>
+  <div class="sidebar-bottom">
+    <a class="nav-link {% if page == 'profile' %}active{% endif %}"
+       href="{% url 'profile' %}"><i class="fa-solid fa-sliders" aria-hidden="true"></i>Configurações</a>
+    <a class="nav-link {% if page == 'design_system' %}active{% endif %}"
+       href="{% url 'design_system' %}"><i class="fa-solid fa-shapes" aria-hidden="true"></i>Design System</a>
+    <div class="sidebar-note">
+      <strong><i class="fa-solid fa-sparkles fa-wand-magic-sparkles"
+   aria-hidden="true"></i> Pequenos passos. Grandes planos.</strong>
+      <p>Cada meta começa com uma escolha. Qual é a sua próxima?</p>
+      <a href="{% url 'reserves' %}" class="button button-sm button-block">Explorar minhas metas <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+    </div>
+    <a class="sidebar-user" href="{% url 'profile' %}"><span class="avatar">{{ user|initials }}</span><span><strong class="small">{{ user.first_name|default:user.username }} {{ user.last_name }}</strong><span class="subtle" style="display:block;font-size:10px">
+      {% if is_demo %}
+        Conta de demonstração
+      {% else %}
+        Conta pessoal
+      {% endif %}
+    </span></span><i class="fa-solid fa-ellipsis" aria-hidden="true"></i></a>
+  </div>
+</aside>

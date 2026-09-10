@@ -1,0 +1,15 @@
+{
+  "name": "genfin",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "GenFin frontend tooling; the application uses native ES modules and pure CSS.",
+  "scripts": {
+    "format": "prettier --write assets/css assets/js docs *.md package.json",
+    "format:check": "prettier --check assets/css assets/js docs *.md package.json",
+    "check:js": "node scripts/check-js.js"
+  },
+  "devDependencies": {
+    "prettier": "3.6.2"
+  }
+}

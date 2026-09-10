@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#05070D">
+    <meta name="description"
+          content="GenFin — clareza para suas finanças, espaço para seus planos.">
+    <title>
+      {% block title %}{{ title|default:'Suas finanças, com clareza' }}{% endblock %}
+    · GenFin</title>
+    <link rel="icon" href="{% static 'favicon.svg' %}" type="image/svg+xml">
+    <link rel="stylesheet" href="{% static 'vendor/inter/inter.css' %}">
+    <link rel="stylesheet"
+          href="{% static 'vendor/fontawesome/css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
+    {% block extra_css %}{% endblock %}
+  </head>
+  <body>
+    <a href="#main-content" class="skip-link">Pular para o conteúdo</a>
+    {% block body %}{% endblock %}
+    <div class="toast-container"
+         id="toasts"
+         aria-live="polite"
+         aria-atomic="false"></div>
+    {% if messages %}
+      <div id="server-messages" hidden>
+        {% for message in messages %}<span>{{ message }}</span>{% endfor %}
+      </div>
+    {% endif %}
+    <script type="module" src="{% static 'js/app.js' %}"></script>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

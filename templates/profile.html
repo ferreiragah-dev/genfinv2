@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% load finance_tags %}
+{% block content %}
+  <div class="page-header">
+    <div>
+      <p class="eyebrow" style="margin-bottom:8px">SEU ESPAÇO</p>
+      <h1>Meu perfil</h1>
+      <p class="page-subtitle">Seus dados e suas preferências, do seu jeito.</p>
+    </div>
+  </div>
+  <div class="profile-grid">
+    <aside class="stack">
+      <section class="card profile-summary">
+        <span class="avatar avatar-lg">{{ user|initials }}</span>
+        <div>
+          <h2>{{ user.first_name|default:user.username }} {{ user.last_name }}</h2>
+          <p class="small muted" style="margin:7px 0 16px">@{{ user.username|truncatechars:22 }}</p>
+          <span class="badge {% if is_demo %}badge-warning{% else %}badge-success{% endif %}">
+            {% if is_demo %}
+              Demonstração
+            {% else %}
+              Conta pessoal
+            {% endif %}
+          </span>
+        </div>
+        <div class="profile-meta">
+          <hr>
+          <p class="small subtle">Por aqui desde {{ user.date_joined|date:'M Y' }}</p>
+        </div>
+      </section>
+      <form action="{% url 'logout' %}" method="post">
+        {% csrf_token %}
+        <button type="submit" class="button button-block">
+          <i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i> Sair da conta
+        </button>
+      </form>
+    </aside>
+    <div class="stack">
+      <section class="card">
+        <div class="card-heading">
+          <div>
+            <h2>Informações pessoais</h2>
+            <p class="small muted" style="margin-top:6px">É bom ter tudo atualizado.</p>
+          </div>
+          <i class="fa-regular fa-user subtle" aria-hidden="true"></i>
+        </div>
+        <form method="post">
+          {% csrf_token %}
+          {% if form.errors %}
+            <div class="error-summary" role="alert">
+              {% for field in form %}
+                {% for error in field.errors %}<p>{{ field.label }}: {{ error }}</p>{% endfor %}
+              {% endfor %}
+            </div>
+          {% endif %}
+          <div class="form-grid">
+            <div class="field">
+              <label for="profile-first">Nome</label>
+              <input class="input"
+                     id="profile-first"
+                     name="first_name"
+                     autocomplete="given-name"
+                     maxlength="150"
+                     value="{{ form.first_name.value|default:'' }}">
+            </div>
+            <div class="field">
+              <label for="profile-last">Sobrenome</label>
+              <input class="input"
+                     id="profile-last"
+                     name="last_name"
+                     autocomplete="family-name"
+                     maxlength="150"
+                     value="{{ form.last_name.value|default:'' }}">
+            </div>
+            <div class="field span-two">
+              <label for="profile-email">E-mail</label>
+              <input class="input"
+                     id="profile-email"
+                     name="email"
+                     type="email"
+                     autocomplete="email"
+                     value="{{ form.email.value|default:'' }}">
+              <span class="help-text">Endereço de contato. Seu acesso continua usando o nome de usuário.</span>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="button button-primary" type="submit">
+              <i class="fa-solid fa-check" aria-hidden="true"></i> Salvar alterações
+            </button>
+          </div>
+        </form>
+      </section>
+      <section class="card">
+        <div class="card-heading">
+          <h2>Preferências de exibição</h2>
+          <i class="fa-solid fa-sliders subtle" aria-hidden="true"></i>
+        </div>
+        <div class="split">
+          <div>
+            <h3 class="small">Discrição ao abrir o GenFin</h3>
+            <p class="small muted" style="margin-top:5px">
+              Oculta os valores neste navegador. Você pode revelá-los na barra superior.
+            </p>
+          </div>
+          <label class="toggle">
+            <input id="privacy-setting"
+                   type="checkbox"
+                   aria-label="Ocultar valores por padrão">
+          </label>
+        </div>
+        <hr>
+        <div class="split">
+          <div>
+            <h3 class="small">Sua visão geral</h3>
+            <p class="small muted" style="margin-top:5px">Escolha os widgets que são importantes para você.</p>
+          </div>
+          <a href="{% url 'dashboard' %}" class="button button-sm">Personalizar <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+        </div>
+      </section>
+      <section class="card glass-card">
+        <div class="inline">
+          <span class="metric-icon"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i></span>
+          <div>
+            <h2>Organização pessoal, com controle</h2>
+            <p class="small muted" style="margin-top:7px">
+              Exporte suas movimentações a qualquer momento em Transações. O GenFin não solicita credenciais bancárias.
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+{% endblock %}

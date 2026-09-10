@@ -1,0 +1,222 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 18px;
+}
+.field label,
+.field-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #cbd5e1;
+}
+.input,
+.select,
+.textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  background: var(--bg);
+  padding: 11px 13px;
+  min-height: 43px;
+  transition:
+    border-color var(--transition),
+    box-shadow var(--transition);
+}
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--subtle);
+}
+.input:focus,
+.select:focus,
+.textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-soft);
+}
+.input[aria-invalid="true"] {
+  border-color: var(--danger);
+}
+.field-error {
+  font-size: 12px;
+  color: #ff9292;
+}
+.help-text {
+  font-size: 11px;
+  color: var(--subtle);
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 18px;
+}
+.span-two {
+  grid-column: 1/-1;
+}
+.checkbox-label,
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--muted);
+}
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--primary);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+.search-field {
+  position: relative;
+  min-width: 220px;
+}
+.search-field i {
+  position: absolute;
+  left: 13px;
+  top: 15px;
+  color: var(--subtle);
+  font-size: 12px;
+}
+.search-field input {
+  padding-left: 37px;
+}
+.filter-select {
+  padding: 9px 30px 9px 12px;
+  background: var(--surface);
+  min-height: 39px;
+  font-size: 12px;
+  width: auto;
+}
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  border-top: 1px solid var(--border);
+  padding-top: 20px;
+  margin-top: 5px;
+}
+.toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.toggle input {
+  appearance: none;
+  width: 34px;
+  height: 20px;
+  background: #334155;
+  border-radius: 20px;
+  position: relative;
+  margin: 0;
+  transition: background var(--transition);
+}
+.toggle input::after {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: white;
+  transition: transform var(--transition);
+}
+.toggle input:checked {
+  background: var(--primary);
+}
+.toggle input:checked::after {
+  transform: translateX(14px);
+}
+.widget-option {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.auth-page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.auth-story {
+  padding: 48px 64px;
+  background:
+    radial-gradient(ellipse at bottom left, #254d922d, transparent 65%), #080e1c;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.auth-story .brand {
+  padding: 0;
+}
+.auth-story h1 {
+  font-size: clamp(32px, 3.4vw, 56px);
+  line-height: 1.13;
+  max-width: 550px;
+  letter-spacing: -2px;
+}
+.auth-story h1 span {
+  color: #779aff;
+}
+.auth-story p {
+  color: var(--muted);
+  font-size: 16px;
+  margin-top: 24px;
+  max-width: 420px;
+}
+.auth-form-wrap {
+  padding: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.auth-form {
+  width: 100%;
+  max-width: 380px;
+}
+.auth-form h1 {
+  font-size: 27px;
+}
+.auth-form > p {
+  margin: 12px 0 32px;
+  color: var(--muted);
+}
+.auth-form .button {
+  font-size: 14px;
+}
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--subtle);
+  font-size: 11px;
+  margin: 24px 0;
+}
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  height: 1px;
+  background: var(--border);
+  flex: 1;
+}
+.auth-stat {
+  padding: 28px;
+  background: linear-gradient(130deg, #142442, #0b152a);
+  border: 1px solid #4f7cff30;
+  border-radius: 16px;
+  margin-top: 40px;
+  max-width: 390px;
+}
+.auth-stat .metric-value {
+  margin: 10px 0 20px;
+}
+.auth-stat .progress {
+  height: 8px;
+}

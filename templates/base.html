@@ -1,0 +1,22 @@
+{% extends 'document.html' %}
+{% load static finance_tags %}
+{% block body %}
+  {% include 'components/sidebar.html' %}
+  <div class="app-main">
+    {% include 'components/navbar.html' %}
+    {% if is_demo %}
+      <div class="demo-banner">
+        <i class="fa-solid fa-flask" aria-hidden="true"></i> Ambiente de demonstração · dados fictícios, exclusivos desta sessão.
+      </div>
+    {% endif %}
+    <main id="main-content" class="content" tabindex="-1">
+      {% block content %}{% endblock %}
+      <footer class="footer">
+        <span><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Seu próximo passo começa com clareza.</span><span>GenFin <span class="subtle">/</span> Feito para a sua vida.</span>
+      </footer>
+    </main>
+  </div>
+  {% include 'components/search.html' %}
+  {% include 'components/transaction_modal.html' %}
+  {% include 'components/confirm_modal.html' %}
+{% endblock %}

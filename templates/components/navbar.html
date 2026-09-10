@@ -1,0 +1,56 @@
+{% load finance_tags %}
+<header class="navbar">
+  <button class="icon-button mobile-only"
+          id="sidebar-toggle"
+          aria-controls="sidebar"
+          aria-expanded="false"
+          aria-label="Abrir navegação">
+    <i class="fa-solid fa-bars" aria-hidden="true"></i>
+  </button>
+  <div class="breadcrumbs">
+    <i class="fa-solid fa-house" aria-hidden="true"></i><span>Espaço pessoal</span><i class="fa-solid fa-chevron-right" aria-hidden="true"></i><span>{{ title }}</span>
+  </div>
+  <div class="nav-actions">
+    <button class="search-trigger"
+            data-open="search-modal"
+            aria-label="Pesquisar no GenFin">
+      <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><span>Buscar algo...</span><kbd>Ctrl K</kbd>
+    </button>
+    <span class="divider"></span>
+    <button class="icon-button"
+            id="privacy-toggle"
+            aria-label="Ocultar valores"
+            aria-pressed="false"
+            title="Ocultar valores">
+      <i class="fa-regular fa-eye" aria-hidden="true"></i>
+    </button>
+    <div class="notification-wrap">
+      <button class="icon-button"
+              id="notifications-toggle"
+              aria-label="Notificações"
+              aria-controls="notifications-panel"
+              aria-expanded="false">
+        <i class="fa-regular fa-bell" aria-hidden="true"></i>
+        {% if pending_count and not notifications_read %}<span class="notification-dot"></span>{% endif %}
+      </button>
+      <section class="notification-panel" id="notifications-panel" hidden>
+        <div class="card-heading">
+          <h2>Notificações</h2>
+          <button class="text-link" id="notifications-read">Marcar como lidas</button>
+        </div>
+        {% for item in pending %}
+          <div class="notification-item">
+            <i class="fa-regular fa-clock" aria-hidden="true"></i>
+            <div>
+              <strong class="small">{{ item.description }}</strong>
+              <p>R$ {{ item.amount|money }} · {{ item.date|date:'d/m' }}</p>
+            </div>
+          </div>
+        {% empty %}
+          <p class="muted small">Tudo em dia. Suas pendências aparecerão aqui.</p>
+        {% endfor %}
+      </section>
+    </div>
+    <a class="avatar" href="{% url 'profile' %}" aria-label="Meu perfil">{{ user|initials }}</a>
+  </div>
+</header>

@@ -1,0 +1,17 @@
+{% load finance_tags %}
+<article class="card metric-card {% if featured %}featured{% endif %}">
+  <div class="metric-top">
+    <span>{{ label }}</span><span class="metric-icon {{ tone }}"><i class="fa-solid fa-{{ icon }}" aria-hidden="true"></i></span>
+  </div>
+  <p class="metric-value" data-money>
+    <span class="currency">R$</span> {{ value|money }}
+  </p>
+  <div class="metric-footer">
+    {% if delta is not None %}
+      <span class="badge {% if tone == 'red' %}badge-warning{% else %}badge-success{% endif %}"><i class="fa-solid fa-arrow-{% if delta < 0 %}down{% else %}up{% endif %}"
+   aria-hidden="true"></i>{{ delta|absolute }}%</span><span>vs. mês anterior</span>
+    {% else %}
+      <span class="{% if featured %}primary-text{% endif %}">{{ footnote }}</span>
+    {% endif %}
+  </div>
+</article>

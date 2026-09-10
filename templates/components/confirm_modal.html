@@ -1,0 +1,18 @@
+<dialog class="modal" id="confirm-modal" aria-labelledby="confirm-title">
+  <div class="modal-header">
+    <div>
+      <h2 id="confirm-title">Excluir registro?</h2>
+      <p id="confirm-description"></p>
+    </div>
+    <button class="icon-button" data-close aria-label="Fechar">
+      <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+    </button>
+  </div>
+  <p class="muted small">
+    O registro será removido e os totais serão recalculados. Esta ação não pode ser desfeita.
+  </p>
+  <div class="form-actions">
+    <button class="button" data-close>Cancelar</button>
+    <button class="button button-danger" id="confirm-delete">Excluir registro</button>
+  </div>
+</dialog>

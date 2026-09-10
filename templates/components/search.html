@@ -1,0 +1,26 @@
+<dialog class="modal search-modal"
+        id="search-modal"
+        aria-label="Pesquisa rápida">
+  <div class="search-modal-header">
+    <i class="fa-solid fa-magnifying-glass muted" aria-hidden="true"></i>
+    <input type="search"
+           class="input"
+           id="global-search"
+           placeholder="Para onde você quer ir?"
+           aria-label="Buscar página ou transação"
+           autocomplete="off">
+    <button class="icon-button" data-close aria-label="Fechar pesquisa">
+      <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+    </button>
+  </div>
+  <div class="search-results">
+    {% for key,label,icon,href in navigation %}
+      <a class="search-result"
+         href="{{ href }}"
+         data-search-label="{{ label }}"><i class="fa-solid fa-{{ icon }}" aria-hidden="true"></i>{{ label }}</a>
+    {% endfor %}
+    <a class="search-result"
+       id="search-transactions"
+       href="{% url 'transactions' %}"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><span>Buscar nas transações</span></a>
+  </div>
+</dialog>

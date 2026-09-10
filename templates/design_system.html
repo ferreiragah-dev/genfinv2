@@ -1,0 +1,236 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+  <div class="page-header">
+    <div>
+      <p class="eyebrow" style="margin-bottom:8px">GENFIN / FOUNDATION</p>
+      <h1>
+        Design System<span class="primary-text">.</span>
+      </h1>
+      <p class="page-subtitle">Uma linguagem visual. Toda a experiência.</p>
+    </div>
+    <span class="badge badge-outline">v1.0 · Dark</span>
+  </div>
+  <section class="card design-section">
+    <h2>Cores semânticas</h2>
+    <p class="muted small">Contraste, hierarquia e significado em cada escolha.</p>
+    <div class="swatches" style="margin-top:24px">
+      <div>
+        <div class="swatch" style="--swatch:#05070D"></div>
+        <p class="swatch-label">
+          Background <span class="subtle">#05070D</span>
+        </p>
+      </div>
+      <div>
+        <div class="swatch" style="--swatch:#0B1224"></div>
+        <p class="swatch-label">
+          Surface <span class="subtle">#0B1224</span>
+        </p>
+      </div>
+      <div>
+        <div class="swatch" style="--swatch:#4F7CFF"></div>
+        <p class="swatch-label">
+          Primary <span class="subtle">#4F7CFF</span>
+        </p>
+      </div>
+      <div>
+        <div class="swatch" style="--swatch:#22C55E"></div>
+        <p class="swatch-label">
+          Success <span class="subtle">#22C55E</span>
+        </p>
+      </div>
+      <div>
+        <div class="swatch" style="--swatch:#EF4444"></div>
+        <p class="swatch-label">
+          Danger <span class="subtle">#EF4444</span>
+        </p>
+      </div>
+      <div>
+        <div class="swatch" style="--swatch:#F59E0B"></div>
+        <p class="swatch-label">
+          Warning <span class="subtle">#F59E0B</span>
+        </p>
+      </div>
+      <div>
+        <div class="swatch" style="--swatch:#FFFFFF"></div>
+        <p class="swatch-label">
+          Text <span class="subtle">#FFFFFF</span>
+        </p>
+      </div>
+      <div>
+        <div class="swatch" style="--swatch:#94A3B8"></div>
+        <p class="swatch-label">
+          Muted <span class="subtle">#94A3B8</span>
+        </p>
+      </div>
+    </div>
+  </section>
+  <div class="grid grid-two">
+    <section class="card design-section">
+      <h2>Tipografia / Inter</h2>
+      <div style="margin-top:24px">
+        <p style="font-size:34px;font-weight:600;letter-spacing:-1px">Clareza por natureza.</p>
+        <p style="font-size:24px;font-weight:500;margin:15px 0">Mais espaço para seus planos.</p>
+        <p class="muted" style="font-size:16px">Uma interface que deixa o essencial aparecer.</p>
+        <p class="small subtle" style="margin-top:16px">12 · 14 · 16 · 20 · 24 · 28 · 34 / números tabulares</p>
+      </div>
+    </section>
+    <section class="card design-section">
+      <h2>Espaço e forma</h2>
+      <p class="small muted" style="margin-top:24px">Escala de 4px: 4 · 8 · 12 · 16 · 20 · 24 · 32 · 40 · 48</p>
+      <div class="component-row">
+        <span class="badge badge-outline">Raio 6px</span><span class="button">Raio 8px</span>
+        <div class="card">Raio 12px</div>
+      </div>
+      <p class="small subtle" style="margin-top:20px">Bordas sutis · elevação contextual · movimento de 180ms</p>
+    </section>
+  </div>
+  <section class="card design-section">
+    <h2>Botões, badges e navegação</h2>
+    <div class="component-row">
+      <button class="button button-primary" data-toast="Ação concluída.">
+        <i class="fa-solid fa-plus" aria-hidden="true"></i> Primário
+      </button>
+      <button class="button" data-toast="Ação secundária executada.">Secundário</button>
+      <button class="button button-ghost" data-toast="Ação discreta executada.">Ghost</button>
+      <button class="button button-danger" data-toast="Exemplo de ação destrutiva.">Destrutivo</button>
+      <button class="button" disabled>Desabilitado</button>
+      <button class="button button-primary" disabled>
+        <span class="spinner"></span> Salvando
+      </button>
+      <button class="icon-button"
+              aria-label="Exemplo de favorito"
+              data-toggle-favorite
+              aria-pressed="false">
+        <i class="fa-regular fa-star" aria-hidden="true"></i>
+      </button>
+    </div>
+    <div class="component-row">
+      <span class="badge">Em andamento</span><span class="badge badge-success">Concluído</span><span class="badge badge-warning">Pendente</span><span class="badge badge-danger">Atenção</span><span class="badge badge-neutral">Informação</span><span class="avatar">GS</span>
+      <details class="dropdown">
+        <summary class="button">
+          Dropdown <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+        </summary>
+        <div class="dropdown-menu">
+          <a href="{% url 'profile' %}"><i class="fa-regular fa-user" aria-hidden="true"></i> Meu perfil</a>
+          <button data-toast="Link de exemplo selecionado.">Uma ação</button>
+        </div>
+      </details>
+    </div>
+  </section>
+  <div class="grid grid-two">
+    <section class="card design-section">
+      <h2>Campos e seleção</h2>
+      <form id="design-form" style="margin-top:24px">
+        <div class="field">
+          <label for="ds-input">Nome do objetivo</label>
+          <input class="input"
+                 id="ds-input"
+                 placeholder="Ex.: Minha próxima viagem"
+                 required>
+          <span class="help-text">Uma descrição curta faz toda a diferença.</span>
+        </div>
+        <div class="field">
+          <label for="ds-select">Categoria</label>
+          <select id="ds-select" class="select">
+            <option>Planejamento pessoal</option>
+            <option>Viagens</option>
+          </select>
+        </div>
+        <div class="component-row">
+          <label class="checkbox-label">
+            <input type="checkbox" checked>
+            Acompanhar meta
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="ds-period" checked>
+            Mensal
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="ds-period">
+            Anual
+          </label>
+          <label class="toggle">
+            <input type="checkbox" checked aria-label="Notificações de exemplo">
+            Notificações
+          </label>
+        </div>
+        <div class="form-actions">
+          <button class="button button-primary" type="submit">Validar formulário</button>
+        </div>
+      </form>
+    </section>
+    <section class="card design-section glass-card">
+      <h2>Superfícies e feedback</h2>
+      <p class="small muted" style="margin-top:8px">Glass Card · transparência com propósito.</p>
+      <div class="component-row">
+        <button class="button" data-open="ds-modal">Abrir modal</button>
+        <button class="button" data-open="ds-drawer">Abrir drawer</button>
+        <button class="button" data-toast="Tudo certo! Sua alteração foi salva.">Mostrar toast</button>
+      </div>
+      <div style="margin-top:28px">
+        <div class="split small">
+          <span>Progresso da meta</span><span>64%</span>
+        </div>
+        <div class="progress"
+             role="progressbar"
+             aria-label="Meta de exemplo"
+             aria-valuenow="64"
+             aria-valuemin="0"
+             aria-valuemax="100">
+          <div class="progress-fill" style="--progress:64%"></div>
+        </div>
+      </div>
+      <div class="inline" style="margin-top:24px">
+        <div class="skeleton" style="width:40px;height:40px"></div>
+        <div style="flex:1">
+          <div class="skeleton" style="width:70%;height:12px;margin-bottom:8px"></div>
+          <div class="skeleton" style="width:45%;height:8px"></div>
+        </div>
+        <span class="small subtle">Loading</span>
+      </div>
+      <div class="empty-state" style="padding-bottom:0">
+        <i class="fa-solid fa-inbox" aria-hidden="true"></i>
+        <h3>Um espaço para começar</h3>
+        <p>Estados vazios orientam o próximo passo.</p>
+      </div>
+    </section>
+  </div>
+  <section class="card design-section">
+    <h2>Componentes em contexto</h2>
+    <p class="small muted" style="margin-top:10px">
+      Metric cards, tabelas, tabs, gráficos, notificações, timeline, busca, sidebar e navbar usam a mesma fundação na visão geral.
+    </p>
+    <a href="{% url 'dashboard' %}" class="button" style="margin-top:20px">Explorar o Dashboard <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+  </section>
+  <dialog class="modal" id="ds-modal" aria-labelledby="ds-modal-title">
+    <div class="modal-header">
+      <div>
+        <h2 id="ds-modal-title">Uma decisão com contexto</h2>
+        <p>Foco no que importa, sem distrações.</p>
+      </div>
+      <button class="icon-button" data-close aria-label="Fechar">
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+      </button>
+    </div>
+    <p class="muted">O foco permanece no modal. Use Escape ou o botão para voltar.</p>
+    <div class="form-actions">
+      <button class="button" data-close>Voltar</button>
+      <button class="button button-primary"
+              data-close
+              data-toast="Exemplo confirmado.">Confirmar</button>
+    </div>
+  </dialog>
+  <dialog class="modal drawer" id="ds-drawer" aria-labelledby="ds-drawer-title">
+    <div class="modal-header">
+      <div>
+        <h2 id="ds-drawer-title">Detalhes ao seu lado</h2>
+        <p>Contexto extra, sem perder o caminho.</p>
+      </div>
+      <button class="icon-button" data-close aria-label="Fechar">
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+      </button>
+    </div>
+    <p class="muted">Drawers acomodam preferências e ações complementares.</p>
+  </dialog>
+{% endblock %}

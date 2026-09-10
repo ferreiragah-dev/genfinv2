@@ -1,0 +1,86 @@
+{% load finance_tags %}
+<div class="table-scroll">
+  <table class="table">
+    <caption class="sr-only">Movimentações financeiras</caption>
+    <thead>
+      <tr>
+        <th scope="col">Descrição</th>
+        <th scope="col">Categoria</th>
+        <th scope="col">Data</th>
+        <th scope="col" class="align-right">Valor</th>
+        <th scope="col">Status</th>
+        {% if editable %}
+          <th scope="col">
+            <span class="sr-only">Ações</span>
+          </th>
+        {% endif %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in recent %}
+        <tr>
+          <td>
+            <div class="transaction-name">
+              <span class="transaction-symbol {{ item.kind }}"><i class="fa-solid {% if item.kind == 'income' %}fa-arrow-down{% else %}fa-arrow-up{% endif %}"
+   aria-hidden="true"></i></span>
+              <div>
+                {{ item.description }}
+                <p>{{ item.account }}</p>
+                {% if item.vehicle %}
+                  <p>
+                    <i class="fa-solid fa-car-side" aria-hidden="true"></i> {{ item.vehicle.name }}
+                  </p>
+                {% endif %}
+              </div>
+            </div>
+          </td>
+          <td>
+            <span class="badge badge-neutral">{{ item.category }}</span>
+          </td>
+          <td>{{ item.date|date:'d M' }}</td>
+          <td class="align-right amount-{{ item.kind }} mono" data-money>
+            {% if item.kind == 'income' %}
+              +
+            {% else %}
+              −
+            {% endif %}
+            R$ {{ item.amount|money }}
+          </td>
+          <td>
+            <span class="badge {% if item.status == 'paid' %}badge-success{% else %}badge-warning{% endif %}"><span aria-hidden="true">•</span> {{ item.get_status_display }}</span>
+          </td>
+          {% if editable %}
+            <td>
+              <div class="row-actions">
+                <button class="icon-button"
+                        data-edit-transaction="{{ item.pk }}"
+                        aria-label="Editar {{ item.description }}">
+                  <i class="fa-solid fa-pen" aria-hidden="true"></i>
+                </button>
+                <button class="icon-button"
+                        data-delete="/api/transactions/{{ item.pk }}/delete/"
+                        data-name="{{ item.description }}"
+                        aria-label="Excluir {{ item.description }}">
+                  <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
+                </button>
+              </div>
+            </td>
+          {% endif %}
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="6">
+            <div class="empty-state">
+              <i class="fa-solid fa-arrow-right-arrow-left" aria-hidden="true"></i>
+              <h3>Nenhuma movimentação por aqui</h3>
+              <p>Adicione uma transação ou ajuste os filtros.</p>
+              <button class="button button-primary" data-new-transaction>
+                <i class="fa-solid fa-plus" aria-hidden="true"></i> Nova transação
+              </button>
+            </div>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

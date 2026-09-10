@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% load finance_tags %}
+{% block content %}
+  <div class="page-header">
+    <div>
+      <p class="eyebrow" style="margin-bottom:8px">
+        {% if recurring %}
+          MAIS PREVISIBILIDADE
+        {% else %}
+          ESPAÇO PARA SEUS PLANOS
+        {% endif %}
+      </p>
+      <h1>{{ title }}</h1>
+      <p class="page-subtitle">{{ subtitle }}</p>
+    </div>
+    <div class="header-actions">
+      <button class="button button-primary" data-new-portfolio>
+        <i class="fa-solid fa-plus" aria-hidden="true"></i>{{ action_label }}
+      </button>
+    </div>
+  </div>
+  <div class="grid grid-three" style="margin-bottom:28px">
+    {% include 'components/metric.html' with label=amount_label value=total icon=icon footnote='Soma dos registros cadastrados' featured=True %}
+    {% block portfolio_metrics_extra %}{% endblock %}
+    {% if not recurring and page != 'vehicles' %}
+      {% include 'components/metric.html' with label=target_label value=target_total icon='flag-checkered' tone='purple' footnote='Planejamento total' %}
+    {% endif %}
+    <article class="card metric-card">
+      <div class="metric-top">
+        <span>Seu acompanhamento</span><span class="metric-icon green"><i class="fa-solid fa-layer-group" aria-hidden="true"></i></span>
+      </div>
+      <p class="metric-value">
+        {{ items|length }} <span class="currency">registro{{ items|length|pluralize }}</span>
+      </p>
+      <div class="metric-footer">
+        {% if recurring %}
+          Previsões · não geram transações automaticamente
+        {% else %}
+          Tudo organizado, em um só lugar
+        {% endif %}
+      </div>
+    </article>
+  </div>
+  {% block portfolio_intro %}{% endblock %}
+  <div class="grid grid-three">
+    {% for item in items %}
+      <article class="card portfolio-card">
+        {% if page == 'credit_cards' %}
+          <div class="bank-card {{ item.color }}">
+            <div class="split">
+              <strong>{{ item.name }}</strong><i class="fa-solid fa-wifi" aria-hidden="true"></i>
+            </div>
+            <div class="bank-card-number">
+              <i class="fa-solid fa-microchip card-chip" aria-hidden="true"></i> &nbsp;•••• &nbsp;••••
+            </div>
+            <div class="bank-card-footer">
+              <span>{{ item.subtitle }}</span><strong>genfin</strong>
+            </div>
+          </div>
+        {% else %}
+          <div class="split">
+            <span class="goal-icon {{ item.color }}"><i class="fa-solid fa-{{ icon }}" aria-hidden="true"></i></span><span class="badge badge-outline">
+              {% if recurring %}
+                Mensal
+              {% elif page == 'vehicles' %}
+                Patrimônio
+              {% else %}
+                {{ item.progress }}% concluído
+              {% endif %}
+            </span>
+          </div>
+          <h2 class="item-title">{{ item.name }}</h2>
+          <p class="small muted" style="margin-top:7px">{{ item.subtitle }}</p>
+        {% endif %}
+        <div class="item-amount" data-money>R$ {{ item.amount|money }}</div>
+        <span class="small muted">{{ amount_label|lower }}</span>
+        {% block portfolio_item_detail %}{% endblock %}
+        {% if not recurring and page != 'vehicles' %}
+          <div class="progress"
+               role="progressbar"
+               aria-label="{{ item.name }}"
+               aria-valuenow="{{ item.progress }}"
+               aria-valuemin="0"
+               aria-valuemax="100">
+            <div class="progress-fill {{ item.color }}"
+                 style="--progress:{{ item.progress }}%"></div>
+          </div>
+          <div class="split small muted" style="margin-top:10px">
+            <span>{{ target_label }}</span><span data-money>R$ {{ item.target|money }}</span>
+          </div>
+        {% endif %}
+        <div class="item-foot">
+          <div class="split small muted">
+            {% if recurring or page == 'credit_cards' %}
+            <span><i class="fa-regular fa-calendar" aria-hidden="true"></i>
+            {% if page == 'fixed_incomes' %}
+              Recebimento
+            {% else %}
+              Vencimento
+            {% endif %}
+          dia {{ item.day }}</span>
+        {% elif item.due_date %}
+          <span><i class="fa-regular fa-calendar" aria-hidden="true"></i> {{ item.due_date|date:'d M Y' }}</span>
+        {% else %}
+          <span>Planeje no seu ritmo</span>
+        {% endif %}
+        <div class="inline" style="gap:3px">
+          <button class="icon-button"
+                  data-edit-portfolio="{{ item.pk }}"
+                  aria-label="Editar {{ item.name }}">
+            <i class="fa-solid fa-pen small" aria-hidden="true"></i>
+          </button>
+          <button class="icon-button"
+                  data-delete="/api/portfolio/{{ item.pk }}/delete/"
+                  data-name="{{ item.name }}"
+                  aria-label="Excluir {{ item.name }}">
+            <i class="fa-regular fa-trash-can small" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </article>{% empty %}
+  <section class="card empty-state" style="grid-column:1/-1">
+    <i class="fa-solid fa-{{ icon }}" aria-hidden="true"></i>
+    <h3>Um novo começo para seus planos</h3>
+    <p>Adicione seu primeiro registro para acompanhar tudo por aqui.</p>
+    <button class="button button-primary" data-new-portfolio>
+      <i class="fa-solid fa-plus" aria-hidden="true"></i>{{ action_label }}
+    </button>
+  </section>
+{% endfor %}
+</div>
+{% block portfolio_after %}{% endblock %}
+{% include 'components/portfolio_modal.html' %}
+{% endblock %}

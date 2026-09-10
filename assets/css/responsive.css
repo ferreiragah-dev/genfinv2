@@ -1,0 +1,358 @@
+@media (min-width: 1600px) {
+  .content {
+    padding: 36px 48px;
+  }
+  .chart-container {
+    height: 255px;
+  }
+  .dashboard-main {
+    grid-template-columns: minmax(0, 2.4fr) minmax(320px, 1fr);
+  }
+}
+@media (max-width: 1250px) {
+  :root {
+    --sidebar-width: 215px;
+  }
+  .content {
+    padding: 28px 24px;
+  }
+  .navbar {
+    padding: 0 24px;
+  }
+  .metric-value {
+    font-size: 23px;
+  }
+  .metric-card {
+    padding: 18px;
+  }
+  .metric-footer {
+    font-size: 9px;
+    gap: 4px;
+  }
+  .metric-footer .badge {
+    font-size: 9px;
+  }
+  .dashboard-main {
+    grid-template-columns: minmax(0, 1.85fr) minmax(265px, 1fr);
+  }
+  .donut-layout {
+    gap: 14px;
+  }
+  .donut-container {
+    width: 130px;
+    height: 130px;
+  }
+  .grid-three {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .chart-legend {
+    gap: 10px;
+  }
+  .search-trigger kbd {
+    margin-left: 12px;
+  }
+}
+@media (max-width: 1050px) {
+  .dashboard-main {
+    grid-template-columns: 1fr;
+  }
+  .dashboard-aside {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .dashboard-aside .score-card {
+    grid-row: span 2;
+  }
+  .metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .metric-value {
+    font-size: 28px;
+  }
+  .metric-footer {
+    font-size: 11px;
+  }
+  .metric-footer .badge {
+    font-size: 10px;
+  }
+  .header-actions {
+    gap: 8px;
+  }
+  .page-header {
+    align-items: flex-start;
+  }
+  .page-header h1 {
+    font-size: 25px;
+  }
+  .breadcrumbs > span:first-of-type {
+    display: none;
+  }
+  .search-trigger span,
+  .search-trigger kbd {
+    display: none;
+  }
+  .profile-grid {
+    grid-template-columns: 220px 1fr;
+  }
+  .auth-story {
+    padding: 36px;
+  }
+  .auth-form-wrap {
+    padding: 36px;
+  }
+}
+@media (max-width: 800px) {
+  :root {
+    --sidebar-width: 240px;
+    --navbar-height: 64px;
+  }
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform var(--transition);
+  }
+  .sidebar.is-open {
+    transform: translateX(0);
+  }
+  .sidebar-overlay.is-open {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: #0009;
+    z-index: 45;
+    backdrop-filter: blur(3px);
+    border: 0;
+  }
+  .app-main {
+    margin-left: 0;
+  }
+  .mobile-only {
+    display: inline-grid;
+  }
+  .navbar {
+    padding: 0 20px;
+  }
+  .content {
+    padding: 24px 20px;
+  }
+  .nav-actions {
+    gap: 9px;
+  }
+  .breadcrumbs {
+    margin-right: auto;
+  }
+  .page-header {
+    flex-wrap: wrap;
+    margin-bottom: 22px;
+  }
+  .header-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+  .page-header .header-actions {
+    justify-content: flex-start;
+  }
+  .auth-page {
+    grid-template-columns: 1fr;
+  }
+  .auth-story {
+    display: none;
+  }
+  .auth-form-wrap {
+    min-height: 100vh;
+    padding: 30px;
+  }
+  .auth-mobile-brand {
+    display: flex !important;
+    margin-bottom: 40px;
+  }
+  .profile-grid {
+    grid-template-columns: 1fr;
+  }
+  .profile-summary {
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .profile-summary .avatar {
+    margin: 0;
+  }
+  .profile-summary hr {
+    display: none;
+  }
+  .profile-summary .profile-meta {
+    margin-left: auto;
+  }
+  .swatches {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 540px) {
+  h1 {
+    font-size: 25px;
+  }
+  .content {
+    padding: 22px 16px;
+  }
+  .navbar {
+    padding: 0 14px;
+  }
+  .breadcrumbs {
+    font-size: 11px;
+    gap: 10px;
+  }
+  .navbar .divider {
+    display: none;
+  }
+  .nav-actions {
+    gap: 3px;
+  }
+  .metrics-grid {
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .metric-card {
+    padding: 16px 14px;
+  }
+  .metric-value {
+    font-size: 23px;
+    letter-spacing: -0.8px;
+  }
+  .metric-value .currency {
+    font-size: 15px;
+  }
+  .metric-top {
+    font-size: 11px;
+    margin-bottom: 12px;
+  }
+  .metric-icon {
+    width: 27px;
+    height: 27px;
+    font-size: 11px;
+  }
+  .metric-footer {
+    flex-wrap: wrap;
+    font-size: 9px;
+    gap: 4px;
+  }
+  .metric-footer .badge {
+    font-size: 9px;
+  }
+  .card {
+    padding: 19px;
+  }
+  .grid-two,
+  .grid-three,
+  .dashboard-aside {
+    grid-template-columns: 1fr;
+  }
+  .dashboard-aside .score-card {
+    grid-row: auto;
+  }
+  .stack,
+  .grid {
+    gap: 18px;
+  }
+  .table-card {
+    padding: 0;
+  }
+  .table-card .card-heading {
+    padding: 19px 19px 0;
+  }
+  .card-heading {
+    gap: 10px;
+  }
+  .card-heading h2 {
+    font-size: 14px;
+  }
+  .cash-summary {
+    gap: 22px;
+  }
+  .cash-summary strong {
+    font-size: 19px;
+  }
+  .chart-legend {
+    font-size: 10px;
+  }
+  .chart-container {
+    height: 190px;
+  }
+  .chart-footer {
+    font-size: 9px;
+  }
+  .header-actions {
+    flex-wrap: wrap;
+  }
+  .header-actions .button {
+    flex: 1;
+    font-size: 11px;
+    padding: 9px 11px;
+  }
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .span-two {
+    grid-column: auto;
+  }
+  .modal {
+    padding: 22px;
+  }
+  .donut-container {
+    width: 145px;
+    height: 145px;
+  }
+  .donut-layout {
+    gap: 25px;
+  }
+  .footer {
+    font-size: 10px;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .footer > span:last-child {
+    max-width: 110px;
+    text-align: right;
+  }
+  .notification-panel {
+    right: -55px;
+    width: min(330px, calc(100vw - 24px));
+  }
+  .toolbar {
+    align-items: stretch;
+  }
+  .toolbar > form {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .toolbar .search-field {
+    width: 100%;
+    min-width: 0;
+  }
+  .search-field input {
+    width: 100%;
+  }
+  .table-footer {
+    padding: 14px;
+    font-size: 10px;
+  }
+  .profile-summary {
+    flex-wrap: wrap;
+  }
+  .profile-summary .profile-meta {
+    margin-left: 0;
+  }
+  .swatches {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .demo-banner {
+    font-size: 10px;
+    padding: 8px;
+  }
+  .tabs .tab {
+    padding: 5px 9px;
+  }
+  .chart-card .card-heading {
+    flex-wrap: wrap;
+  }
+}

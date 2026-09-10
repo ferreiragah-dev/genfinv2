@@ -1,0 +1,395 @@
+{% extends 'base.html' %}
+{% load static finance_tags %}
+{% block content %}
+  <div class="page-header">
+    <div>
+      <div class="inline" style="gap:9px;margin-bottom:6px">
+        <span class="eyebrow">SEU DINHEIRO, EM PERSPECTIVA</span><span class="status-dot" style="margin:0" aria-hidden="true"></span>
+      </div>
+      <h1>
+        Olá, {{ user.first_name|default:'vamos começar' }} <span style="font-size:23px" aria-hidden="true">✦</span>
+      </h1>
+      <p class="page-subtitle">Uma visão clara de hoje. Mais possibilidades para amanhã.</p>
+    </div>
+    <div class="header-actions">
+      <button class="button" data-open="period-modal">
+        <i class="fa-regular fa-calendar" aria-hidden="true"></i>{{ month_label }}<i class="fa-solid fa-chevron-down small" aria-hidden="true"></i>
+      </button>
+      <button class="button button-primary" data-new-transaction>
+        <i class="fa-solid fa-plus" aria-hidden="true"></i> Nova transação
+      </button>
+    </div>
+  </div>
+  <div class="grid metrics-grid">
+    {% include 'components/metric.html' with label='Receitas do mês' value=income icon='arrow-down' tone='green' delta=income_delta footnote='Receitas concluídas no período' %}
+    {% include 'components/metric.html' with label='Despesas do mês' value=expense icon='arrow-up' tone='red' delta=expense_delta footnote='Despesas concluídas no período' %}
+    {% include 'components/metric.html' with label='Saldo do mês' value=balance icon='wallet' featured=True footnote='Receitas menos despesas concluídas' %}
+    {% include 'components/metric.html' with label='Patrimônio líquido' value=wealth icon='chart-line' tone='purple' footnote='Saldo acumulado + bens − faturas' %}
+  </div>
+  <div class="split" style="margin-bottom:16px">
+    <div class="inline">
+      <span class="status-dot" aria-hidden="true"></span><span class="small muted">Seu panorama financeiro</span>
+    </div>
+    <button class="text-link" data-open="widgets-drawer">
+      <i class="fa-solid fa-sliders" aria-hidden="true"></i> Personalizar widgets
+    </button>
+  </div>
+  <div class="grid dashboard-main">
+    <div class="stack">
+      <section class="card chart-card"
+               data-widget="cashflow"
+               {% if not preferences|widget_visible:'cashflow' %}hidden{% endif %}>
+        <div class="card-heading">
+          <h2>Fluxo de caixa</h2>
+          <div class="tabs"
+               role="tablist"
+               aria-label="Visualização do fluxo de caixa">
+            <button class="tab"
+                    role="tab"
+                    aria-selected="true"
+                    aria-controls="cashflow-panel"
+                    id="chart-accumulated"
+                    data-chart-mode="cumulative">Acumulado</button>
+            <button class="tab"
+                    role="tab"
+                    aria-selected="false"
+                    aria-controls="cashflow-panel"
+                    id="chart-daily"
+                    tabindex="-1"
+                    data-chart-mode="daily">Diário</button>
+          </div>
+        </div>
+        <div class="split" style="align-items:flex-start">
+          <div class="cash-summary">
+            <div>
+              <span class="small muted">Entradas</span><strong data-money>R$ {{ income|money }}</strong>
+            </div>
+            <div>
+              <span class="small muted">Saídas</span><strong data-money>R$ {{ expense|money }}</strong>
+            </div>
+          </div>
+          <div class="chart-legend">
+            <span><i class="legend-dot" aria-hidden="true"></i>Receitas</span><span><i class="legend-dot purple" aria-hidden="true"></i>Despesas</span>
+          </div>
+        </div>
+        <div id="cashflow-panel"
+             role="tabpanel"
+             aria-labelledby="chart-accumulated">
+          <div class="chart-container">
+            <canvas id="cashflow-chart"
+                    role="img"
+                    aria-label="Fluxo de caixa. Receitas de R$ {{ income|money }} e despesas de R$ {{ expense|money }} no período."></canvas>
+          </div>
+        </div>
+        <div class="chart-footer">
+          <span><i class="fa-regular fa-circle-check" aria-hidden="true"></i> Apenas movimentações concluídas</span><span>{{ month_label }} · valores em BRL</span>
+        </div>
+      </section>
+      <div class="grid grid-two">
+        <section class="card"
+                 data-widget="categories"
+                 {% if not preferences|widget_visible:'categories' %}hidden{% endif %}>
+          <div class="card-heading">
+            <h2>Onde você gastou</h2>
+            <a href="{% url 'transactions' %}?kind=expense&month={{ month }}"
+               class="icon-button"
+               aria-label="Ver despesas"><i class="fa-solid fa-arrow-up-right-from-square small"
+   aria-hidden="true"></i></a>
+          </div>
+          {% if categories %}
+            <div class="donut-layout">
+              <div class="donut-container">
+                <canvas id="categories-chart"
+                        role="img"
+                        aria-label="Distribuição de despesas por categoria. Consulte a legenda ao lado."></canvas>
+                <div class="donut-center">
+                  <span>Total do mês</span><strong data-money>{{ expense|money }}</strong>
+                </div>
+              </div>
+              <ul class="category-legend">
+                {% for category in categories|slice:':5' %}
+                  <li>
+                    <span class="category-label"><i class="legend-dot"
+   style="background:{{ category.color }}"
+   aria-hidden="true"></i>{{ category.category }}</span><span class="mono">{{ category.percent }}%</span>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% else %}
+            <div class="empty-state">
+              <p>Suas categorias aparecerão após a primeira despesa.</p>
+            </div>
+          {% endif %}
+        </section>
+        <section class="card"
+                 data-widget="heatmap"
+                 {% if not preferences|widget_visible:'heatmap' %}hidden{% endif %}>
+          <div class="card-heading">
+            <h2>Seu ritmo financeiro</h2>
+            <span class="badge badge-outline">91 dias</span>
+          </div>
+          <p class="small muted" style="margin-bottom:17px">Cada quadrado, um dia de despesas.</p>
+          <div class="heatmap-days">
+            <span>Há 3 meses</span><span>{{ month_label }}</span>
+          </div>
+          <div class="heatmap-wrap">
+            <div class="heatmap"
+                 role="img"
+                 aria-label="Mapa de despesas dos últimos 91 dias; tons mais claros representam mais gastos.">
+              {% for day in heatmap %}
+                <span class="heatmap-cell"
+                      data-level="{{ day.level }}"
+                      title="{{ day.date|date:'d/m/Y' }}: R$ {{ day.amount|money }}"></span>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="heatmap-key">
+            Menos <span class="heatmap-cell" data-level="0"></span><span class="heatmap-cell" data-level="1"></span><span class="heatmap-cell" data-level="2"></span><span class="heatmap-cell" data-level="3"></span><span class="heatmap-cell" data-level="4"></span> Mais
+          </div>
+        </section>
+      </div>
+      <section class="card table-card"
+               data-widget="recent"
+               {% if not preferences|widget_visible:'recent' %}hidden{% endif %}>
+        <div class="card-heading">
+          <h2>Últimas movimentações</h2>
+          <a href="{% url 'transactions' %}?month={{ month }}" class="text-link">Ver todas <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+        </div>
+        {% include 'components/transaction_table.html' %}
+        <div class="table-footer">
+          <span>Os últimos registros de {{ month_label|lower }}</span><a class="text-link"
+   href="{% url 'export_transactions' %}?month={{ month }}"><i class="fa-solid fa-arrow-down-to-line fa-download" aria-hidden="true"></i> Exportar</a>
+        </div>
+      </section>
+      <div class="grid grid-two"
+           data-widget="rankings"
+           {% if not preferences|widget_visible:'rankings' %}hidden{% endif %}>
+        <section class="card">
+          <div class="card-heading">
+            <h2>Top gastos</h2>
+            <span class="metric-icon red"><i class="fa-solid fa-arrow-trend-up" aria-hidden="true"></i></span>
+          </div>
+          {% for category in categories|slice:':4' %}
+            <div class="ranking-row">
+              <span class="rank">0{{ forloop.counter }}</span>
+              <div class="rank-content">
+                <div class="split">
+                  <span>{{ category.category }}</span><span data-money>R$ {{ category.total|money }}</span>
+                </div>
+                <div class="progress">
+                  <div class="progress-fill"
+                       style="--progress:{{ category.percent }}%;
+                              background:{{ category.color }}"></div>
+                </div>
+              </div>
+            </div>
+          {% empty %}
+            <p class="small muted">Nenhuma despesa concluída no período.</p>
+          {% endfor %}
+        </section>
+        <section class="card">
+          <div class="card-heading">
+            <h2>Top receitas</h2>
+            <span class="metric-icon green"><i class="fa-solid fa-arrow-trend-down" aria-hidden="true"></i></span>
+          </div>
+          {% for category in income_categories|slice:':4' %}
+            <div class="ranking-row">
+              <span class="rank">0{{ forloop.counter }}</span>
+              <div class="rank-content">
+                <div class="split">
+                  <span>{{ category.category }}</span><span data-money>R$ {{ category.total|money }}</span>
+                </div>
+                <div class="progress">
+                  <div class="progress-fill green"
+                       style="--progress:{{ category.percent }}%"></div>
+                </div>
+              </div>
+            </div>
+          {% empty %}
+            <p class="small muted">Nenhuma receita concluída no período.</p>
+          {% endfor %}
+        </section>
+      </div>
+    </div>
+    <aside class="stack dashboard-aside"
+           aria-label="Planejamento e saúde financeira">
+      <section class="card score-card"
+               data-widget="score"
+               {% if not preferences|widget_visible:'score' %}hidden{% endif %}>
+        <div class="card-heading">
+          <h2>Saúde financeira</h2>
+          <details class="dropdown">
+            <summary class="icon-button" aria-label="Como o score é calculado">
+              <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
+            </summary>
+            <div class="dropdown-menu"
+                 style="width:230px;
+                        text-align:left;
+                        padding:14px">
+              <p class="small muted">
+                Indicador interno, não é score de crédito. Capacidade de poupança: até 60 pontos (30% de receitas poupadas). Registros concluídos: até 40 pontos.
+              </p>
+            </div>
+          </details>
+        </div>
+        <div class="score-gauge">
+          <svg viewBox="0 0 196 123" aria-hidden="true">
+            <defs><linearGradient id="score-gradient"><stop stop-color="#136443" /><stop offset="1" stop-color="#4de994" /></linearGradient></defs>
+            <path d="M 18 104 A 80 80 0 0 1 178 104" fill="none" stroke="#152b28" stroke-width="9" stroke-linecap="round" />
+            <path d="M 18 104 A 80 80 0 0 1 178 104" fill="none" stroke="url(#score-gradient)" stroke-width="9" stroke-linecap="round" stroke-dasharray="251.3" stroke-dashoffset="{{ score_offset|stringformat:'.2f' }}" />
+          </svg>
+          <div class="score-reading">
+            {{ score }}<span>/ 100</span>
+          </div>
+        </div>
+        <span class="badge {% if score >= 80 %}badge-success{% else %}badge-warning{% endif %}"><i class="fa-solid fa-arrow-trend-up" aria-hidden="true"></i>{{ score_label }}</span>
+        <p class="score-description">
+          {% if score >= 80 %}
+            Você está construindo uma relação mais tranquila com o seu dinheiro.
+          {% else %}
+            Acompanhe os registros e encontre espaço para seus próximos planos.
+          {% endif %}
+        </p>
+        <div class="score-insight">
+          <i class="fa-regular fa-lightbulb" aria-hidden="true"></i><span>Você poupou <strong class="positive">{{ saving_rate }}%</strong> das receitas deste mês. Continue acompanhando sua evolução.</span>
+        </div>
+      </section>
+      <section class="card"
+               data-widget="goals"
+               {% if not preferences|widget_visible:'goals' %}hidden{% endif %}>
+        <div class="card-heading">
+          <h2>Planos ganhando vida</h2>
+          <a href="{% url 'reserves' %}"
+             class="text-link"
+             aria-label="Ver todas as metas"><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+        </div>
+        {% for goal in goals %}
+          <div class="goal">
+            <div class="inline">
+              <span class="goal-icon {{ goal.color }}"><i class="fa-solid {% if forloop.counter == 1 %}fa-shield-halved{% elif forloop.counter == 2 %}fa-plane{% else %}fa-flag-checkered{% endif %}"
+   aria-hidden="true"></i></span>
+              <div>
+                <h3 style="font-size:12px">{{ goal.name }}</h3>
+                <span class="subtle" style="font-size:10px">{{ goal.progress }}% do caminho</span>
+              </div>
+            </div>
+            <div class="split">
+              <span data-money>R$ {{ goal.amount|money }}</span><span class="subtle" data-money>de {{ goal.target|money }}</span>
+            </div>
+            <div class="progress"
+                 role="progressbar"
+                 aria-label="{{ goal.name }}"
+                 aria-valuenow="{{ goal.progress }}"
+                 aria-valuemin="0"
+                 aria-valuemax="100">
+              <div class="progress-fill {{ goal.color }}"
+                   style="--progress:{{ goal.progress }}%"></div>
+            </div>
+          </div>
+        {% empty %}
+          <p class="small muted">Qual é o seu próximo plano?</p>
+        {% endfor %}
+        <a href="{% url 'reserves' %}"
+           class="button button-ghost button-sm button-block"
+           style="margin-top:10px"><i class="fa-solid fa-plus" aria-hidden="true"></i> Criar uma meta</a>
+      </section>
+      <section class="card alert-card"
+               data-widget="alerts"
+               {% if not preferences|widget_visible:'alerts' %}hidden{% endif %}>
+        <div class="inline">
+          <span class="alert-icon"><i class="fa-regular fa-bell" aria-hidden="true"></i></span>
+          <h3 style="font-size:12px">
+            {% if pending_count %}
+              Um lembrete para você
+            {% else %}
+              Tudo em dia por aqui
+            {% endif %}
+          </h3>
+        </div>
+        <p>
+          {% if pending_count %}
+            Você tem <strong style="color:var(--text)">{{ pending_count }} movimentaç{{ pending_count|pluralize:'ão,ões' }} pendente{{ pending_count|pluralize }}</strong> no período. Reserve um momento para conferir.
+          {% else %}
+            Nenhuma pendência no período. Aproveite para revisar seus próximos objetivos.
+          {% endif %}
+        </p>
+        <a class="text-link"
+           href="{% url 'transactions' %}?status=pending&month={{ month }}">Conferir pendências <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+      </section>
+      <section class="card"
+               data-widget="timeline"
+               {% if not preferences|widget_visible:'timeline' %}hidden{% endif %}>
+        <div class="card-heading">
+          <h2>Sua linha do tempo</h2>
+          <i class="fa-solid fa-clock-rotate-left subtle small" aria-hidden="true"></i>
+        </div>
+        {% for item in timeline %}
+          <div class="timeline-item">
+            <span class="timeline-icon"><i class="fa-solid {% if item.kind == 'income' %}fa-arrow-down{% else %}fa-arrow-up{% endif %}"
+   aria-hidden="true"></i></span>
+            <div class="timeline-content">
+              {{ item.description }}
+              <p>
+                {{ item.date|date:'d M' }} · <span data-money>R$ {{ item.amount|money }}</span>
+              </p>
+            </div>
+          </div>
+        {% empty %}
+          <p class="small muted">Sua história financeira começa no primeiro registro.</p>
+        {% endfor %}
+      </section>
+    </aside>
+  </div>
+  <dialog class="modal" id="period-modal" aria-labelledby="period-title">
+    <div class="modal-header">
+      <div>
+        <h2 id="period-title">Escolha o período</h2>
+        <p>Explore suas finanças mês a mês.</p>
+      </div>
+      <button class="icon-button" data-close aria-label="Fechar">
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+      </button>
+    </div>
+    <form method="get">
+      <div class="field">
+        <label for="dashboard-month">Mês de referência</label>
+        <input class="input"
+               type="month"
+               name="month"
+               id="dashboard-month"
+               value="{{ month }}"
+               required>
+      </div>
+      <div class="form-actions">
+        <button class="button" type="button" data-close>Cancelar</button>
+        <button class="button button-primary" type="submit">Aplicar período</button>
+      </div>
+    </form>
+  </dialog>
+  <dialog class="modal drawer"
+          id="widgets-drawer"
+          aria-labelledby="widgets-title">
+    <div class="modal-header">
+      <div>
+        <h2 id="widgets-title">Do seu jeito</h2>
+        <p>Escolha o que faz parte da sua visão geral.</p>
+      </div>
+      <button class="icon-button" data-close aria-label="Fechar">
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+      </button>
+    </div>
+    <form id="widgets-form">
+      <div id="widget-options"></div>
+      <div class="form-actions">
+        <button type="button" class="button" id="widgets-reset">Restaurar</button>
+        <button class="button button-primary" type="submit">Salvar preferências</button>
+      </div>
+    </form>
+  </dialog>
+  {{ preferences|json_script:'widget-preferences' }}
+  {{ chart_data|json_script:'chart-data' }}
+{% endblock %}
+{% block scripts %}
+  <script src="{% static 'vendor/chart.umd.js' %}" defer></script><script type="module" src="{% static 'js/dashboard.js' %}"></script>
+{% endblock %}

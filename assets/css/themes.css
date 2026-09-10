@@ -1,0 +1,25 @@
+/* Default dark theme is the product baseline; values remain semantic. */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f4f6fb;
+  --surface: #fff;
+  --surface-raised: #fff;
+  --surface-hover: #edf1fa;
+  --text: #111b31;
+  --muted: #596a82;
+  --subtle: #64748b;
+  --border: rgba(30, 51, 90, 0.12);
+  --shadow: 0 16px 50px #1424420d;
+}
+.privacy-on [data-money] {
+  filter: blur(7px);
+  user-select: none;
+}
+.privacy-on [data-money]:hover {
+  filter: blur(7px);
+}
+.privacy-on canvas,
+.privacy-on .heatmap {
+  filter: blur(7px);
+  pointer-events: none;
+}

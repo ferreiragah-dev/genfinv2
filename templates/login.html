@@ -1,0 +1,165 @@
+{% extends 'document.html' %}
+{% load static %}
+{% block title %}
+  {% if registration %}
+    Criar conta
+  {% else %}
+    Bem-vindo de volta
+  {% endif %}
+{% endblock %}
+{% block body %}
+  <main class="auth-page" id="main-content">
+    <section class="auth-story">
+      <a class="brand" href="{% url 'landing' %}"><span class="brand-mark"><span>g</span></span><span class="brand-name">gen<span>fin</span>.</span></a>
+      <div>
+        <span class="eyebrow primary-text">MENOS RUÍDO. MAIS POSSIBILIDADES.</span>
+        <h1 style="margin-top:20px">
+          Uma vida financeira
+          <br>
+          com mais <span>clareza.</span>
+        </h1>
+        <p>Seu dinheiro, seus planos e suas próximas conquistas. Finalmente, no mesmo lugar.</p>
+        <div class="auth-stat">
+          <div class="split">
+            <span class="small muted">O próximo capítulo</span><span class="badge badge-success"><i class="fa-solid fa-seedling" aria-hidden="true"></i> Começa com você</span>
+          </div>
+          <h2 style="font-size:24px;margin:18px 0">
+            Grandes planos.
+            <br>
+            Um passo de cada vez.
+          </h2>
+          <div class="progress">
+            <div class="progress-fill" style="--progress:68%"></div>
+          </div>
+          <p class="small" style="margin-top:13px">Mais consciência em cada escolha.</p>
+        </div>
+      </div>
+      <span class="small subtle">Feito para a sua vida. No seu ritmo.</span>
+    </section>
+    <section class="auth-form-wrap">
+      <div class="auth-form">
+        <a class="brand auth-mobile-brand"
+           href="{% url 'landing' %}"
+           style="display:none;
+                  padding:0"><span class="brand-mark"><span>g</span></span><span class="brand-name">gen<span>fin</span>.</span></a>
+        <h1>
+          {% if registration %}
+            Seu novo começo
+          {% else %}
+            Bem-vindo de volta
+          {% endif %}
+          <span class="primary-text">.</span>
+        </h1>
+        <p>
+          {% if registration %}
+            Crie sua conta e dê espaço aos seus planos.
+          {% else %}
+            Entre para cuidar do que vem pela frente.
+          {% endif %}
+        </p>
+        {% if form.errors %}
+          <div class="error-summary" role="alert">
+            {% if registration %}
+              {% for field in form %}
+                {% for error in field.errors %}<p>{{ field.label }}: {{ error }}</p>{% endfor %}
+              {% endfor %}
+              {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+            {% else %}
+              Usuário ou senha incorretos. Confira os dados e tente novamente.
+            {% endif %}
+          </div>
+        {% endif %}
+        <form method="post">
+          {% csrf_token %}
+          {% if registration %}
+            <div class="field">
+              <label for="first-name">Como podemos chamar você?</label>
+              <input class="input"
+                     id="first-name"
+                     name="first_name"
+                     autocomplete="given-name"
+                     maxlength="150"
+                     required
+                     value="{{ form.first_name.value|default:'' }}"
+                     placeholder="Seu nome">
+            </div>
+            <div class="field">
+              <label for="email">E-mail</label>
+              <input class="input"
+                     type="email"
+                     id="email"
+                     name="email"
+                     autocomplete="email"
+                     required
+                     value="{{ form.email.value|default:'' }}"
+                     placeholder="voce@exemplo.com">
+            </div>
+          {% endif %}
+          <div class="field">
+            <label for="username">Nome de usuário</label>
+            <input class="input"
+                   id="username"
+                   name="username"
+                   autocomplete="username"
+                   required
+                   maxlength="150"
+                   value="{{ form.username.value|default:'' }}"
+                   placeholder="Seu usuário"
+                   {% if not registration %}autofocus{% endif %}>
+          </div>
+          <div class="field">
+            <label for="password">Senha</label>
+            <input class="input"
+                   id="password"
+                   type="password"
+                   name="{% if registration %}password1{% else %}password{% endif %}"
+                   autocomplete="{% if registration %}new-password{% else %}current-password{% endif %}"
+                   required
+                   placeholder="Sua senha">
+            {% if registration %}
+              <span class="help-text">Use ao menos 8 caracteres. Evite senhas comuns e dados pessoais.</span>
+            {% endif %}
+          </div>
+          {% if registration %}
+            <div class="field">
+              <label for="password-confirm">Confirme sua senha</label>
+              <input class="input"
+                     id="password-confirm"
+                     type="password"
+                     name="password2"
+                     autocomplete="new-password"
+                     required
+                     placeholder="Repita sua senha">
+            </div>
+          {% endif %}
+          {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+          <button class="button button-primary button-block button-lg" type="submit">
+            {% if registration %}
+              Criar minha conta
+            {% else %}
+              Entrar no GenFin
+            {% endif %}
+            <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+          </button>
+        </form>
+        {% if not registration %}
+          <div class="auth-divider">ou conheça antes de começar</div>
+          <form method="post" action="{% url 'demo' %}">
+            {% csrf_token %}
+            <button class="button button-block" type="submit">
+              <i class="fa-solid fa-flask" aria-hidden="true"></i> Explorar demonstração
+            </button>
+          </form>
+          <p class="small subtle" style="text-align:center;margin-top:10px">Um espaço de teste com dados fictícios.</p>
+        {% endif %}
+        <p class="small muted" style="text-align:center;margin-top:28px">
+          {% if registration %}
+            Já tem uma conta? <a class="primary-text" href="{% url 'login' %}">Entrar</a>
+          {% else %}
+            Ainda não tem conta? <a class="primary-text" href="{% url 'register' %}">Comece por aqui</a>
+          {% endif %}
+        </p>
+      </div>
+    </section>
+  </main>
+{% endblock %}

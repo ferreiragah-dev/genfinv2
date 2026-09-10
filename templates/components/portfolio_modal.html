@@ -1,0 +1,110 @@
+<dialog class="modal"
+        id="portfolio-modal"
+        aria-labelledby="portfolio-modal-title">
+  <div class="modal-header">
+    <div>
+      <h2 id="portfolio-modal-title" data-create-title="{{ action_label }}">{{ action_label }}</h2>
+      <p>Organize os detalhes e acompanhe sua evolução.</p>
+    </div>
+    <button class="icon-button" data-close aria-label="Fechar">
+      <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+    </button>
+  </div>
+  <form id="portfolio-form" action="/api/portfolio/" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="kind" value="{{ page }}">
+    <div class="error-summary" hidden role="alert"></div>
+    <div class="form-grid">
+      <div class="field span-two">
+        <label for="item-name">Nome</label>
+        <input class="input"
+               name="name"
+               id="item-name"
+               maxlength="100"
+               required
+               placeholder="Dê um nome ao seu registro">
+      </div>
+      <div class="field span-two">
+        <label for="item-subtitle">
+          {% if page == 'credit_cards' %}
+            Bandeira e últimos 4 dígitos (opcional)
+          {% else %}
+            Descrição (opcional)
+          {% endif %}
+        </label>
+        <input class="input"
+               name="subtitle"
+               id="item-subtitle"
+               maxlength="120"
+               placeholder="Um detalhe para identificar melhor">
+        {% if page == 'credit_cards' %}
+          <span class="help-text">Não informe o número completo, validade ou código de segurança.</span>
+        {% endif %}
+      </div>
+      <div class="field">
+        <label for="item-amount">{{ amount_label }} (R$)</label>
+        <input class="input"
+               name="amount"
+               id="item-amount"
+               type="number"
+               min="0"
+               max="999999999999.99"
+               step="0.01"
+               required
+               value="0"
+               inputmode="decimal">
+      </div>
+      {% if recurring or page == 'vehicles' %}
+        <input type="hidden" name="target" value="0">
+      {% else %}
+        <div class="field">
+          <label for="item-target">{{ target_label }} (R$)</label>
+          <input class="input"
+                 name="target"
+                 id="item-target"
+                 type="number"
+                 min="0.01"
+                 max="999999999999.99"
+                 step="0.01"
+                 required
+                 inputmode="decimal">
+        </div>
+      {% endif %}
+      {% if recurring or page == 'credit_cards' %}
+        <div class="field">
+          <label for="item-day">Dia do mês</label>
+          <input class="input"
+                 name="day"
+                 id="item-day"
+                 type="number"
+                 min="1"
+                 max="31"
+                 value="5"
+                 required>
+        </div>
+        <input type="hidden" name="due_date" value="">
+      {% else %}
+        <input type="hidden" name="day" value="5">
+        <div class="field">
+          <label for="item-date">Data do objetivo (opcional)</label>
+          <input class="input" name="due_date" id="item-date" type="date">
+        </div>
+      {% endif %}
+      <div class="field">
+        <label for="item-color">Cor de identificação</label>
+        <select class="select" name="color" id="item-color">
+          <option value="blue">Azul</option>
+          <option value="purple">Roxo</option>
+          <option value="green">Verde</option>
+          <option value="orange">Laranja</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="button" type="button" data-close>Cancelar</button>
+      <button class="button button-primary" type="submit">
+        <i class="fa-solid fa-check" aria-hidden="true"></i><span class="button-label">Salvar registro</span>
+      </button>
+    </div>
+  </form>
+</dialog>
