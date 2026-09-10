@@ -12,6 +12,13 @@ SECRET_KEY = os.getenv("SECRET_KEY", "development-only-genfin-change-before-depl
 if not DEBUG and SECRET_KEY.startswith("development-only"):
     raise ImproperlyConfigured("Set SECRET_KEY before running in production.")
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1,testserver").split(",")
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip() for origin in os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",") if origin.strip()
+]
+# Enable only behind a trusted proxy that overwrites X-Forwarded-Proto.
+# In Easypanel, expose HTTP through Domains rather than publishing the app port.
+if os.getenv("TRUST_PROXY", "False").lower() == "true":
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",

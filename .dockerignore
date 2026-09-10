@@ -1,0 +1,15 @@
+.git
+.venv
+.env
+.env.*
+node_modules
+staticfiles
+__pycache__
+**/__pycache__
+*.pyc
+*.sqlite3
+*.sqlite3-*
+.artifacts
+.ruff_cache
+.pytest_cache
+*.log

@@ -4,6 +4,8 @@ Aplicação financeira criada do zero com **Django, PostgreSQL, HTML5, CSS puro 
 
 ## Executar no Windows
 
+Para hospedar, siga o [guia de deploy no Easypanel](docs/easypanel.md). O repositório inclui Dockerfile, Gunicorn e configuração de HTTPS por proxy.
+
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\python -m pip install -r requirements.txt
