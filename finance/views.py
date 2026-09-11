@@ -8,11 +8,23 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
 from django.core.paginator import Paginator
+from django.core.exceptions import ValidationError
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
+from django.views.decorators.cache import never_cache
+from django.views.decorators.debug import sensitive_post_parameters
+from .account_reset import reset_account
 from .demo import create_demo_user
-from .forms import TransactionForm, PortfolioForm, ProfileForm, RegistrationForm, CATEGORIES
+from .forms import (
+    TransactionForm,
+    PortfolioForm,
+    ProfileForm,
+    RegistrationForm,
+    AccountResetForm,
+    CATEGORIES,
+)
+from .pluggy import PluggyError
 from .models import Transaction, PortfolioItem, Preferences
 from .services import dashboard_data, month_bounds, total
 from .vehicle_services import vehicle_month_data
@@ -192,7 +204,58 @@ def profile(request):
         form.save()
         messages.success(request, "Perfil atualizado com sucesso.")
         return redirect("profile")
-    return render(request, "profile.html", {"page": "profile", "title": "Meu perfil", "form": form})
+    return render(
+        request,
+        "profile.html",
+        {
+            "page": "profile",
+            "title": "Meu perfil",
+            "form": form,
+            "reset_form": AccountResetForm(),
+        },
+    )
+
+
+@sensitive_post_parameters("password")
+@never_cache
+@login_required
+@require_POST
+def account_reset(request):
+    form = AccountResetForm(request.POST)
+    response_status = 400
+    if form.is_valid():
+        try:
+            reset_account(request.user.pk, form.cleaned_data["password"])
+        except ValidationError as exc:
+            form.add_error("password", exc)
+        except PluggyError:
+            response_status = 502
+            form.add_error(
+                None,
+                (
+                    "Não foi possível concluir a desconexão com a Pluggy. Seus dados locais "
+                    "foram preservados; algumas instituições podem já ter sido desconectadas. "
+                    "Tente novamente em alguns minutos ou peça ao administrador para verificar a integração."
+                ),
+            )
+        else:
+            messages.success(
+                request,
+                "Conta resetada. Todos os dados financeiros foram apagados. Seu acesso foi mantido.",
+            )
+            return redirect("profile")
+    return render(
+        request,
+        "profile.html",
+        {
+            "page": "profile",
+            "title": "Meu perfil",
+            "form": ProfileForm(instance=request.user),
+            "reset_form": form,
+            "show_reset": True,
+        },
+        status=response_status,
+    )
 
 
 @login_required

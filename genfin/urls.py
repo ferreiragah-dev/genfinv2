@@ -14,6 +14,7 @@ urlpatterns = [
     path("landing/", views.landing, name="landing"),
     path("transactions/", views.transactions, name="transactions"),
     path("profile/", views.profile, name="profile"),
+    path("profile/reset/", views.account_reset, name="account_reset"),
     path("open-finance/", open_finance_views.index, name="open_finance"),
     path("api/open-finance/token/", open_finance_views.connect_token, name="pluggy_token"),
     path("api/open-finance/items/", open_finance_views.register_item, name="pluggy_register"),

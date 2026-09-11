@@ -54,6 +54,8 @@ O commit acontece somente depois de obter todas as páginas e verificar que o It
 
 **Desconectar** remove o Item na Pluggy, interrompe novas importações e preserva o histórico local. Uma falha remota mantém a conexão ativa para permitir nova tentativa. Para mudar de sandbox para dados reais, use uma conta GenFin separada para não misturar os históricos.
 
+Para começar novamente na mesma conta, vá a **Meu Perfil → Resetar conta**, leia a confirmação e digite sua senha do GenFin. Esse reset desconecta todas as instituições e apaga permanentemente todos os dados financeiros, incluindo o histórico importado e as preferências do dashboard. Nome, e-mail, login e senha são preservados. Importações em andamento e retornos antigos do widget não podem restaurar os dados. Se alguma desconexão na Pluggy falhar, os dados locais são preservados; algumas instituições podem já ter sido desconectadas, e o reset pode ser tentado novamente. Contas temporárias de demonstração não podem usar o reset.
+
 ## Easypanel
 
 Configure as três variáveis Pluggy no serviço web. Crie um serviço App adicional, `pluggy-worker`, com a mesma origem/imagem e as mesmas variáveis de banco, Django e Pluggy. Use o comando de inicialização:

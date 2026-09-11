@@ -85,3 +85,13 @@ class ProfileForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ["first_name", "last_name", "email"]
+
+
+class AccountResetForm(forms.Form):
+    password = forms.CharField(
+        label="Sua senha atual",
+        strip=False,
+        max_length=128,
+        widget=forms.PasswordInput(attrs={"autocomplete": "current-password"}),
+        error_messages={"required": "Digite sua senha para confirmar o reset."},
+    )

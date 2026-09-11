@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load finance_tags %}
+{% load static finance_tags %}
 {% block content %}
   <div class="page-header">
     <div>
@@ -128,6 +128,81 @@
           </div>
         </div>
       </section>
+      <section class="card" aria-labelledby="reset-section-title">
+        <div class="card-heading">
+          <h2 id="reset-section-title">Zerar meus dados</h2>
+          <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+        </div>
+        <p class="small muted" style="line-height:1.7;margin-bottom:16px">
+          Apague todas as transações, cartões, veículos, viagens, receitas e despesas fixas,
+          reservas, metas e dados importados. As instituições serão desconectadas e as
+          preferências do dashboard voltarão ao padrão. Seu perfil, login e senha serão mantidos.
+        </p>
+        {% if user.has_usable_password and not is_demo %}
+          <button type="button"
+                  class="button button-danger"
+                  data-open="reset-account-modal">
+            <i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Resetar conta
+          </button>
+        {% else %}
+          <p class="small muted">
+            O reset exige uma conta pessoal com senha. Contas de demonstração não podem ser resetadas.
+          </p>
+        {% endif %}
+      </section>
     </div>
   </div>
+  <dialog class="modal"
+          id="reset-account-modal"
+          aria-labelledby="reset-account-title"
+          aria-describedby="reset-account-description"
+          {% if show_reset %}data-show-reset{% endif %}>
+    <div class="modal-header">
+      <div>
+        <h2 id="reset-account-title">Resetar conta?</h2>
+        <p id="reset-account-description">Esta ação é permanente e não pode ser desfeita.</p>
+      </div>
+      <button type="button"
+              class="icon-button"
+              data-close
+              aria-label="Fechar confirmação de reset">
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+      </button>
+    </div>
+    <p class="small muted" style="line-height:1.7;margin-bottom:20px">
+      Todos os seus dados financeiros e importações serão apagados, e as instituições da Pluggy
+      serão desconectadas. Você continuará usando o mesmo perfil e senha.
+      Digite a senha do GenFin para confirmar.
+    </p>
+    <form id="reset-account-form"
+          action="{% url 'account_reset' %}"
+          method="post">
+      {% csrf_token %}
+      {% if reset_form.errors %}
+        <div id="reset-account-errors" class="error-summary" role="alert">
+          {% for error in reset_form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+          {% for error in reset_form.password.errors %}<p>{{ error }}</p>{% endfor %}
+        </div>
+      {% endif %}
+      <div class="field">
+        <label for="reset-account-password">Sua senha atual</label>
+        <input id="reset-account-password"
+               class="input"
+               type="password"
+               name="password"
+               autocomplete="current-password"
+               autofocus
+               required
+               maxlength="128"
+               {% if reset_form.password.errors %}aria-invalid="true" aria-describedby="reset-account-errors"{% endif %}>
+      </div>
+      <div class="form-actions">
+        <button class="button" type="button" data-close>Cancelar</button>
+        <button class="button button-danger" type="submit">Confirmar reset e apagar dados</button>
+      </div>
+    </form>
+  </dialog>
+{% endblock %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/profile.js' %}"></script>
 {% endblock %}

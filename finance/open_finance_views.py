@@ -5,6 +5,7 @@ from functools import wraps
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
@@ -68,18 +69,24 @@ def connect_token(request):
         except ValueError:
             return JsonResponse({"message": "Conexão inválida."}, status=400)
         connection = get_object_or_404(BankConnection, pk=pk, owner=request.user, active=True)
-    identity, _ = OpenFinanceIdentity.objects.get_or_create(owner=request.user)
     client = PluggyClient()
     connectors = [c["id"] for c in client.connectors() if allowed_connector(c)]
     if not connectors:
         raise PluggyError("Nenhuma instituição está disponível para este ambiente.")
-    if connection:
-        verify_item(client.item(connection.item_id), identity, connection.item_id)
+    with transaction.atomic():
+        get_user_model().objects.select_for_update().get(pk=request.user.pk)
+        identity, _ = OpenFinanceIdentity.objects.get_or_create(owner=request.user)
+        if connection:
+            connection = get_object_or_404(
+                BankConnection, pk=connection.pk, owner=request.user, active=True
+            )
+            verify_item(client.item(connection.item_id), identity, connection.item_id)
+        token = client.connect_token(
+            identity.client_user_id, connection.item_id if connection else None
+        )
     return JsonResponse(
         {
-            "accessToken": client.connect_token(
-                identity.client_user_id, connection.item_id if connection else None
-            ),
+            "accessToken": token,
             "connectorIds": connectors,
             "includeSandbox": settings.PLUGGY_SANDBOX,
             "updateItem": str(connection.item_id) if connection else None,
@@ -96,10 +103,11 @@ def register_item(request):
         item_id = identifier(data.get("itemId"))
     except (ValueError, PluggyError):
         return JsonResponse({"message": "Conexão inválida."}, status=400)
-    identity = get_object_or_404(OpenFinanceIdentity, owner=request.user)
     item = PluggyClient().item(item_id)
-    verify_item(item, identity, item_id)
     with transaction.atomic():
+        get_user_model().objects.select_for_update().get(pk=request.user.pk)
+        identity = get_object_or_404(OpenFinanceIdentity, owner=request.user)
+        verify_item(item, identity, item_id)
         connection, created = BankConnection.objects.select_for_update().get_or_create(
             item_id=item_id,
             defaults={

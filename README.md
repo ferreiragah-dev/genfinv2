@@ -46,6 +46,7 @@ Esse modo explícito usa SQLite em `preview.sqlite3`, somente para desenvolvimen
 - Design System navegável em `/design-system/`, biblioteca própria de componentes, sidebar e navbar compartilhadas.
 - Dashboard com receitas, despesas, saldo, patrimônio, fluxo acumulado/diário, score interno, categorias, rankings, heatmap, timeline, metas, alertas, últimas movimentações e seleção persistente de widgets.
 - Login, cadastro, logout via POST, perfil editável e landing page.
+- Em Meu Perfil, **Resetar conta** exige a senha atual, desconecta as instituições da Pluggy e apaga transações, importações, cartões, veículos, viagens, receitas/despesas fixas, reservas, metas e preferências do dashboard. O perfil e o acesso são preservados. A exclusão é permanente; se a desconexão remota falhar, os dados locais são preservados para uma nova tentativa.
 - Criação, edição, exclusão, busca, filtros, paginação e exportação CSV de transações.
 - Cadastro, edição e exclusão de cartões, veículos, viagens, despesas fixas, receitas fixas e reservas.
 - Feedback de sucesso/erro, validação no navegador e servidor, estados vazios, modais nativos, drawer, busca rápida `Ctrl/Cmd+K` e opção local de ocultar valores.

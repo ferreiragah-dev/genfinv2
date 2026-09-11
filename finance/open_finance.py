@@ -6,6 +6,7 @@ from time import monotonic
 from uuid import UUID
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
@@ -87,8 +88,8 @@ def transaction_values(row, account, connection, start, end):
 
 def sync_connection(connection_id, lease, client=None):
     """Fetch outside the DB transaction, then commit only a complete, stable snapshot."""
-    connection = BankConnection.objects.get(pk=connection_id)
-    if not connection.active or connection.locked_until != lease:
+    connection = BankConnection.objects.filter(pk=connection_id).first()
+    if not connection or not connection.active or connection.locked_until != lease:
         return
     client = client or PluggyClient()
     identity = OpenFinanceIdentity.objects.get(owner_id=connection.owner_id)
@@ -136,8 +137,16 @@ def sync_connection(connection_id, lease, client=None):
     ):
         raise PluggyError("Os dados estão sendo atualizados pela instituição. Tente novamente.")
     with transaction.atomic():
-        connection = BankConnection.objects.select_for_update().get(pk=connection_id)
-        if not connection.active or connection.locked_until != lease or lease <= timezone.now():
+        # Same lock order as reset and item registration prevents a completed
+        # import from recreating data after the account has been cleared.
+        get_user_model().objects.select_for_update().get(pk=connection.owner_id)
+        connection = BankConnection.objects.select_for_update().filter(pk=connection_id).first()
+        if (
+            not connection
+            or not connection.active
+            or connection.locked_until != lease
+            or lease <= timezone.now()
+        ):
             return
         for row, external_id, entries in snapshot:
             account, _ = BankAccount.objects.get_or_create(
