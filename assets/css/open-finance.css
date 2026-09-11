@@ -1,0 +1,45 @@
+.bank-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+.bank-empty {
+  grid-column: 1 / -1;
+}
+.bank-card .card-heading {
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.bank-card p,
+#open-finance .card > p {
+  margin-top: 10px;
+  line-height: 1.65;
+}
+.bank-account {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+}
+.bank-account > span {
+  font-size: 13px;
+}
+.bank-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
+}
+#open-finance .eyebrow {
+  margin-bottom: 8px;
+}
+#connection-feedback:empty {
+  display: none;
+}
+@media (max-width: 900px) {
+  .bank-grid {
+    grid-template-columns: 1fr;
+  }
+}

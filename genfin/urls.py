@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.views import LogoutView
 from django.urls import path
 from finance import views
+from finance import open_finance_views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -13,6 +14,16 @@ urlpatterns = [
     path("landing/", views.landing, name="landing"),
     path("transactions/", views.transactions, name="transactions"),
     path("profile/", views.profile, name="profile"),
+    path("open-finance/", open_finance_views.index, name="open_finance"),
+    path("api/open-finance/token/", open_finance_views.connect_token, name="pluggy_token"),
+    path("api/open-finance/items/", open_finance_views.register_item, name="pluggy_register"),
+    path("api/open-finance/status/", open_finance_views.status, name="pluggy_status"),
+    path("api/open-finance/<int:pk>/sync/", open_finance_views.sync, name="pluggy_sync"),
+    path(
+        "api/open-finance/<int:pk>/disconnect/",
+        open_finance_views.disconnect,
+        name="pluggy_disconnect",
+    ),
     path("design-system/", views.design_system, name="design_system"),
     path("api/transactions/", views.transaction_save, name="transaction_create"),
     path("api/transactions/<int:pk>/", views.transaction_detail),

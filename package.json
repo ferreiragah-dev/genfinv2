@@ -7,7 +7,8 @@
   "scripts": {
     "format": "prettier --write assets/css assets/js docs *.md package.json",
     "format:check": "prettier --check assets/css assets/js docs *.md package.json",
-    "check:js": "node scripts/check-js.js"
+    "check:js": "node scripts/check-js.js",
+    "test:open-finance": "node --test scripts/test-open-finance.js"
   },
   "devDependencies": {
     "prettier": "3.6.2"

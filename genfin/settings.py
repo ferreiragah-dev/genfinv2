@@ -90,6 +90,10 @@ LOGOUT_REDIRECT_URL = "/login/"
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
 X_FRAME_OPTIONS = "DENY"
+# Application credentials are used exclusively by the backend.
+PLUGGY_CLIENT_ID = os.getenv("PLUGGY_CLIENT_ID", "").strip()
+PLUGGY_CLIENT_SECRET = os.getenv("PLUGGY_CLIENT_SECRET", "").strip()
+PLUGGY_SANDBOX = os.getenv("PLUGGY_SANDBOX", "True").lower() == "true"
 if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True

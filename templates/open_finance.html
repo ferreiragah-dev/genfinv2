@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% load static finance_tags %}
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/open-finance.css' %}">
+{% endblock %}
+{% block content %}
+  <div id="open-finance"
+       data-status-url="{% url 'pluggy_status' %}"
+       data-token-url="{% url 'pluggy_token' %}"
+       data-register-url="{% url 'pluggy_register' %}">
+    {% csrf_token %}
+    <div class="page-header">
+      <div>
+        <p class="eyebrow">SUAS CONTAS, CONECTADAS</p>
+        <h1>Open Finance</h1>
+        <p class="page-subtitle">Traga suas movimentações para o GenFin com a Pluggy.</p>
+      </div>
+      {% if connection_allowed %}
+        <button class="button button-primary" type="button" data-connect-bank>
+          <i class="fa-solid fa-plus" aria-hidden="true"></i> Conectar instituição
+        </button>
+      {% endif %}
+    </div>
+    <div class="stack">
+      {% if sandbox %}
+        <section class="card glass-card">
+          <div class="card-heading">
+            <h2>
+              <i class="fa-solid fa-flask" aria-hidden="true"></i> Ambiente de testes
+            </h2>
+            <span class="badge badge-warning">Sandbox</span>
+          </div>
+          <p class="small muted">
+            Use somente dados fictícios. As movimentações de teste aparecerão no seu dashboard.
+          </p>
+          <p class="small muted">
+            No Pluggy Bank, use <strong>user-ok</strong> e <strong>password-ok</strong>. Se solicitado, o código de teste é <strong>123456</strong>.
+          </p>
+        </section>
+      {% endif %}
+      {% if is_demo %}
+        <section class="card">
+          <h2>Use sua conta pessoal</h2>
+          <p class="small muted">Saia da demonstração e crie uma conta para testar a conexão com a Pluggy.</p>
+          <a class="button" href="{% url 'profile' %}">Ir ao perfil</a>
+        </section>
+      {% elif not pluggy_ready %}
+        <section class="card">
+          <h2>Conexão em preparação</h2>
+          <p class="small muted">
+            A integração com a Pluggy precisa ser ativada pelo administrador. Suas contas aparecerão aqui depois da configuração.
+          </p>
+        </section>
+      {% endif %}
+      <p id="connection-feedback"
+         class="small muted"
+         role="status"
+         aria-live="polite"></p>
+      <div class="bank-grid">
+        {% for connection in connections %}
+          <section class="card bank-card"
+                   data-bank-id="{{ connection.pk }}"
+                   data-bank-status="{{ connection.status }}">
+            <div class="card-heading">
+              <div class="inline">
+                <span class="metric-icon"><i class="fa-solid fa-building-columns" aria-hidden="true"></i></span>
+                <h2>{{ connection.institution }}</h2>
+              </div>
+              <span class="badge {% if connection.active %}badge-success{% else %}badge-neutral{% endif %}">
+                {% if connection.sandbox %}Teste ·{% endif %}
+                {% if connection.active %}
+                  Conectada
+                {% else %}
+                  Desconectada
+                {% endif %}
+              </span>
+            </div>
+            <p class="small muted" data-sync-message>{{ connection.sync_message|default:'Aguardando importação.' }}</p>
+            <p class="small subtle">
+              Última importação: <span data-sync-time>{{ connection.last_synced_at|date:'d/m/Y H:i'|default:'ainda não realizada' }}</span>
+            </p>
+            {% for account in connection.accounts.all %}
+              <div class="bank-account">
+                <div>
+                  <strong class="small">{{ account.name }}</strong>
+                  <p class="small subtle">
+                    {% if account.kind == 'BANK' %}
+                      Conta bancária
+                    {% else %}
+                      Cartão · sem importação de compras
+                    {% endif %}
+                  </p>
+                </div>
+                <span class="mono" data-money>
+                  {% if account.balance is not None %}
+                    {{ account.currency }} {{ account.balance|money }}
+                  {% else %}
+                    Saldo indisponível
+                  {% endif %}
+                </span>
+              </div>
+            {% empty %}
+              <p class="small subtle">As contas serão exibidas após a primeira importação.</p>
+            {% endfor %}
+            {% if connection.active and connection_allowed %}
+              <div class="bank-actions">
+                <button class="button button-sm"
+                        type="button"
+                        data-sync-bank="{% url 'pluggy_sync' connection.pk %}">
+                  <i class="fa-solid fa-rotate" aria-hidden="true"></i> Importar dados
+                </button>
+                <button class="button button-sm"
+                        type="button"
+                        data-connect-bank="{{ connection.pk }}">Renovar conexão</button>
+                <button class="button button-sm"
+                        type="button"
+                        data-disconnect-bank="{% url 'pluggy_disconnect' connection.pk %}">
+                  Desconectar
+                </button>
+              </div>
+            {% endif %}
+          </section>
+        {% empty %}
+          <section class="card empty-state bank-empty">
+            <i class="fa-solid fa-building-columns" aria-hidden="true"></i>
+            <h2>Nenhuma instituição conectada</h2>
+            <p>Escolha uma instituição e siga as etapas de autorização da Pluggy.</p>
+          </section>
+        {% endfor %}
+      </div>
+      <section class="card">
+        <h2>Você controla a conexão</h2>
+        <p class="small muted">
+          A autorização acontece na Pluggy. O GenFin importa os últimos 90 dias de movimentações de contas bancárias em reais e atualiza lançamentos já importados.
+        </p>
+        <p class="small muted">
+          “Importar dados” busca o que já está disponível na Pluggy. Use “Renovar conexão” para atualizar a coleta na instituição ou concluir uma autorização pendente.
+        </p>
+        <p class="small muted">
+          Saldos bancários aparecem nesta tela. O dashboard continua calculando seu fluxo pelos lançamentos; compras de cartão, investimentos e conversão de moedas não são importados. Lançamentos manuais não são conciliados automaticamente com os bancários.
+        </p>
+        <p class="small muted">
+          Ao desconectar, a conexão é removida da Pluggy e as novas importações param. O histórico no GenFin é preservado.
+        </p>
+      </section>
+    </div>
+  </div>
+  <dialog id="disconnect-bank-dialog" class="modal">
+    <form method="dialog" class="modal-body">
+      <h2>Desconectar instituição?</h2>
+      <p class="small muted">
+        A conexão será removida da Pluggy. Os lançamentos importados continuarão no GenFin.
+      </p>
+      <div class="form-actions">
+        <button class="button" value="cancel">Cancelar</button>
+        <button class="button button-primary" value="confirm">Desconectar</button>
+      </div>
+    </form>
+  </dialog>
+{% endblock %}
+{% block scripts %}
+  <script type="module" src="{% static 'js/open-finance.js' %}"></script>
+{% endblock %}

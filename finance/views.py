@@ -227,6 +227,10 @@ def transaction_detail(request, pk):
 @require_POST
 def transaction_save(request, pk=None):
     instance = get_object_or_404(Transaction, pk=pk, owner=request.user) if pk else None
+    if instance and instance.pluggy_id:
+        return JsonResponse(
+            {"message": "Movimentações bancárias são atualizadas pela sincronização."}, status=409
+        )
     form = TransactionForm(request.POST, instance=instance, user=request.user)
     if not form.is_valid():
         return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
@@ -241,7 +245,12 @@ def transaction_save(request, pk=None):
 @login_required
 @require_POST
 def transaction_delete(request, pk):
-    get_object_or_404(Transaction, pk=pk, owner=request.user).delete()
+    instance = get_object_or_404(Transaction, pk=pk, owner=request.user)
+    if instance.pluggy_id:
+        return JsonResponse(
+            {"message": "Movimentações bancárias são atualizadas pela sincronização."}, status=409
+        )
+    instance.delete()
     return JsonResponse({"message": "Transação excluída."})
 
 

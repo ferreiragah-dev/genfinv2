@@ -6,6 +6,8 @@ Aplicação financeira criada do zero com **Django, PostgreSQL, HTML5, CSS puro 
 
 Para hospedar, siga o [guia de deploy no Easypanel](docs/easypanel.md). O repositório inclui Dockerfile, Gunicorn e configuração de HTTPS por proxy.
 
+A integração [Open Finance com Pluggy](docs/open-finance.md) está disponível, com sandbox como padrão. Configure as credenciais no servidor e execute o importador para conectar instituições de teste.
+
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\python -m pip install -r requirements.txt
@@ -78,7 +80,7 @@ docs/                    Arquitetura e Design System
 - **Reservas:** saldos mantidos fora da conta de movimentações. Não cadastre o mesmo dinheiro como receita e como reserva externa para evitar dupla contagem.
 - **Viagens:** orçamento de planejamento; não entra novamente no patrimônio.
 - **Despesas e receitas fixas:** previsões mensais. Não geram transações automaticamente. O pagamento/recebimento deve ser registrado em Transações.
-- **Cartões:** faturas e limites manuais. Sem integração bancária, parcelas ou importação automática.
+- **Cartões:** faturas e limites manuais. A integração Pluggy exibe contas/cartões em Open Finance e importa movimentações de contas bancárias em reais; compras de cartão e parcelas não são importadas.
 - **Custo mensal do veículo:** soma de transações concluídas nas categorias IPVA, Seguro veicular e Combustível, vinculadas ao veículo e datadas no mês escolhido. IPVA e seguro entram pelo pagamento (ou parcela), sem rateio anual. Use os atalhos na aba Veículos ou selecione o veículo ao lançar a despesa em Transações. Edição, exclusão e mudança de status atualizam o mesmo registro, sem duplicação. Despesas antigas precisam ter a categoria e o veículo definidos manualmente; não há associação por nome. Excluir o veículo preserva as transações financeiras e remove seu vínculo.
 - **Score:** indicador interno explicável (capacidade de poupança até 60 pontos e proporção de registros concluídos até 40). Não é score de crédito nem recomendação financeira.
 - **Heatmap:** 91 dias de despesas concluídas até o final do mês escolhido; intensidade baseada no valor diário.
@@ -111,7 +113,7 @@ npm run format
 
 ## Limites de operação
 
-Esta entrega é uma aplicação local funcional. Publicação, domínio, e-mail transacional, recuperação de senha, MFA, verificação de e-mail, limitação de tentativas de login, cobrança de assinatura e integração bancária não estão configurados. Não há sincronização com contas financeiras.
+Esta entrega é uma aplicação local funcional. Publicação, domínio, e-mail transacional, recuperação de senha, MFA, verificação de e-mail, limitação de tentativas de login e cobrança de assinatura não estão configurados. A integração bancária com Pluggy exige credenciais próprias e um processo de importação ativo; consulte o [guia Open Finance](docs/open-finance.md).
 
 Para produção, use servidor WSGI, PostgreSQL gerenciado ou operado com backups, HTTPS, `GENFIN_DEBUG=False`, uma `SECRET_KEY` privada e `ALLOWED_HOSTS` explícitos. Defina uma política de retenção para contas de demonstração; o comando `purge_demo_accounts` remove demonstrações inativas há mais de sete dias. O servidor `runserver` é apenas para desenvolvimento.
 

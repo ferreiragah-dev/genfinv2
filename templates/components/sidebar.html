@@ -18,6 +18,8 @@
     {% endfor %}
   </nav>
   <div class="sidebar-bottom">
+    <a class="nav-link {% if page == 'open_finance' %}active{% endif %}"
+       href="{% url 'open_finance' %}"><i class="fa-solid fa-building-columns" aria-hidden="true"></i>Open Finance</a>
     <a class="nav-link {% if page == 'profile' %}active{% endif %}"
        href="{% url 'profile' %}"><i class="fa-solid fa-sliders" aria-hidden="true"></i>Configurações</a>
     <a class="nav-link {% if page == 'design_system' %}active{% endif %}"

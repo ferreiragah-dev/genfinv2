@@ -51,19 +51,25 @@
           </td>
           {% if editable %}
             <td>
-              <div class="row-actions">
-                <button class="icon-button"
-                        data-edit-transaction="{{ item.pk }}"
-                        aria-label="Editar {{ item.description }}">
-                  <i class="fa-solid fa-pen" aria-hidden="true"></i>
-                </button>
-                <button class="icon-button"
-                        data-delete="/api/transactions/{{ item.pk }}/delete/"
-                        data-name="{{ item.description }}"
-                        aria-label="Excluir {{ item.description }}">
-                  <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
-                </button>
-              </div>
+              {% if item.pluggy_id %}
+                <a class="badge badge-neutral"
+                   href="{% url 'open_finance' %}"
+                   title="Atualizada pela instituição">Open Finance</a>
+              {% else %}
+                <div class="row-actions">
+                  <button class="icon-button"
+                          data-edit-transaction="{{ item.pk }}"
+                          aria-label="Editar {{ item.description }}">
+                    <i class="fa-solid fa-pen" aria-hidden="true"></i>
+                  </button>
+                  <button class="icon-button"
+                          data-delete="/api/transactions/{{ item.pk }}/delete/"
+                          data-name="{{ item.description }}"
+                          aria-label="Excluir {{ item.description }}">
+                    <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
+                  </button>
+                </div>
+              {% endif %}
             </td>
           {% endif %}
         </tr>

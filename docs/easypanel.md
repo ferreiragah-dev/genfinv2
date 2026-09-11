@@ -2,6 +2,8 @@
 
 Use um projeto com dois serviços: um App Django e um Postgres. O Dockerfile usa Gunicorn, coleta os assets com WhiteNoise e aplica as migrações ao iniciar. A imagem não inclui o `.env` nem o banco da máquina de desenvolvimento.
 
+Para ativar o Open Finance, configure também as credenciais Pluggy e um worker conforme o [guia da integração](open-finance.md#easypanel).
+
 ## 1. Banco
 
 Crie o projeto `genfin` e um serviço Postgres chamado `db`, com a imagem `postgres:17-alpine`. Aguarde o banco iniciar. Em Credentials, copie o host interno, nome do banco, usuário e senha. Mantenha a conexão pela rede interna do projeto.

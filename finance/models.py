@@ -1,10 +1,12 @@
 """User-owned financial records. Monetary values never use floats."""
 
 from decimal import Decimal
+from uuid import uuid4
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.db.models import Q
+from django.utils import timezone
 from .constants import VEHICLE_CATEGORIES
 
 
@@ -28,6 +30,11 @@ class Transaction(OwnedModel):
     date = models.DateField()
     status = models.CharField(max_length=7, choices=STATUS, default="paid")
     account = models.CharField(max_length=60, default="Conta principal")
+    pluggy_id = models.UUIDField(null=True, blank=True, unique=True, editable=False)
+    pluggy_date = models.DateField(null=True, blank=True, editable=False)
+    bank_account = models.ForeignKey(
+        "BankAccount", null=True, blank=True, on_delete=models.CASCADE, editable=False
+    )
     vehicle = models.ForeignKey(
         "PortfolioItem",
         on_delete=models.SET_NULL,
@@ -103,3 +110,35 @@ class Preferences(OwnedModel):
     owner = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     widgets = models.JSONField(default=dict)
     notifications_read = models.BooleanField(default=False)
+
+
+class OpenFinanceIdentity(models.Model):
+    owner = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    # Opaque identifier: no email, CPF or predictable user id is sent to Pluggy.
+    client_user_id = models.UUIDField(default=uuid4, unique=True, editable=False)
+
+
+class BankConnection(OwnedModel):
+    item_id = models.UUIDField(unique=True)
+    institution = models.CharField(max_length=120)
+    sandbox = models.BooleanField(default=True)
+    active = models.BooleanField(default=True)
+    status = models.CharField(max_length=40, default="QUEUED")
+    last_synced_at = models.DateTimeField(null=True, blank=True)
+    next_sync_at = models.DateTimeField(default=timezone.now, db_index=True)
+    locked_until = models.DateTimeField(null=True, blank=True)
+    sync_message = models.CharField(max_length=250, blank=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+
+class BankAccount(models.Model):
+    connection = models.ForeignKey(
+        BankConnection, on_delete=models.CASCADE, related_name="accounts"
+    )
+    external_id = models.UUIDField(unique=True)
+    name = models.CharField(max_length=120)
+    kind = models.CharField(max_length=20)
+    currency = models.CharField(max_length=3)
+    balance = models.DecimalField(max_digits=18, decimal_places=2, null=True)
