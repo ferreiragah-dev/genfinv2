@@ -2,6 +2,7 @@
 
 from decimal import Decimal
 from uuid import uuid4
+from hashlib import sha256
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
@@ -18,7 +19,23 @@ class OwnedModel(models.Model):
         abstract = True
 
 
+class TransactionQuerySet(models.QuerySet):
+    def for_totals(self):
+        return self.filter(review_role="normal")
+
+
 class Transaction(OwnedModel):
+    objects = TransactionQuerySet.as_manager()
+    REVIEW_ROLES = [
+        ("normal", "Incluída nos totais"),
+        ("duplicate", "Duplicata conciliada"),
+        ("transfer", "Transferência interna"),
+    ]
+    review_role = models.CharField(
+        max_length=12, choices=REVIEW_ROLES, default="normal", editable=False
+    )
+    reviewed_at = models.DateTimeField(null=True, blank=True, editable=False)
+    category_locked = models.BooleanField(default=False, editable=False)
     TYPES = [("income", "Receita"), ("expense", "Despesa")]
     STATUS = [("paid", "Concluído"), ("pending", "Pendente")]
     description = models.CharField(max_length=120)
@@ -58,6 +75,25 @@ class Transaction(OwnedModel):
 
     def __str__(self):
         return self.description
+
+    @property
+    def review_version(self):
+        fields = (
+            self.pk,
+            self.owner_id,
+            self.amount,
+            self.kind,
+            self.date,
+            self.status,
+            self.account,
+            self.bank_account_id,
+            self.description,
+            self.review_role,
+            self.category,
+            self.vehicle_id,
+            self.category_locked,
+        )
+        return sha256(repr(fields).encode()).hexdigest()
 
 
 class PortfolioItem(OwnedModel):
@@ -142,3 +178,54 @@ class BankAccount(models.Model):
     kind = models.CharField(max_length=20)
     currency = models.CharField(max_length=3)
     balance = models.DecimalField(max_digits=18, decimal_places=2, null=True)
+
+
+class CategoryRule(OwnedModel):
+    match_text = models.CharField(max_length=120)
+    kind = models.CharField(max_length=7, choices=Transaction.TYPES)
+    category = models.CharField(max_length=40)
+    vehicle = models.ForeignKey(PortfolioItem, null=True, blank=True, on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ["-id"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["owner", "match_text", "kind"], name="unique_category_rule"
+            )
+        ]
+
+
+class ReviewPair(OwnedModel):
+    KINDS = [("duplicate", "Duplicata"), ("transfer", "Transferência interna")]
+    kind = models.CharField(max_length=12, choices=KINDS)
+    first = models.OneToOneField(
+        Transaction, on_delete=models.CASCADE, related_name="review_as_first"
+    )
+    second = models.ForeignKey(
+        Transaction, on_delete=models.CASCADE, related_name="review_as_second"
+    )
+
+    class Meta:
+        ordering = ["-id"]
+        constraints = [
+            models.CheckConstraint(
+                condition=~Q(first=models.F("second")), name="review_pair_distinct_records"
+            )
+        ]
+
+
+class ReviewDismissal(OwnedModel):
+    kind = models.CharField(max_length=12, choices=ReviewPair.KINDS)
+    first = models.ForeignKey(
+        Transaction, on_delete=models.CASCADE, related_name="dismissals_first"
+    )
+    second = models.ForeignKey(
+        Transaction, on_delete=models.CASCADE, related_name="dismissals_second"
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["first", "second", "kind"], name="unique_review_dismissal"
+            )
+        ]

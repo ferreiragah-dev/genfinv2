@@ -7,7 +7,14 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.views.decorators.debug import sensitive_variables
 
-from .models import BankConnection, OpenFinanceIdentity, PortfolioItem, Preferences, Transaction
+from .models import (
+    BankConnection,
+    OpenFinanceIdentity,
+    PortfolioItem,
+    Preferences,
+    Transaction,
+    CategoryRule,
+)
 from .pluggy import PluggyClient
 
 
@@ -30,6 +37,7 @@ def reset_account(user_id, password):
             client.delete_item(connection.item_id)
 
     Transaction.objects.filter(owner=user).delete()
+    CategoryRule.objects.filter(owner=user).delete()
     PortfolioItem.objects.filter(owner=user).delete()
     BankConnection.objects.filter(owner=user).delete()  # Cascades to bank accounts.
     Preferences.objects.filter(owner=user).delete()

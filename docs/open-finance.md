@@ -45,7 +45,7 @@ O commit acontece somente depois de obter todas as páginas e verificar que o It
 
 ## Escopo financeiro
 
-- Contas `BANK` em `BRL`: importação de receitas/despesas, concluídas ou pendentes, categorizadas inicialmente como **Outros**.
+- Contas `BANK` em `BRL`: importação de receitas/despesas, concluídas ou pendentes, classificadas pelas regras locais, com **Outros** como categoria inicial quando nenhuma regra combina.
 - Contas e cartões: nome, tipo, moeda e saldo disponível na Pluggy são exibidos em Open Finance. CPF, credenciais bancárias e payloads completos não são armazenados pelo GenFin.
 - Compras de cartão e investimentos não entram no dashboard nesta versão. Isso evita lançar compras de cartão novamente junto com a saída bancária do pagamento da fatura.
 - Saldos da instituição não são somados ao patrimônio calculado a partir dos lançamentos. O saldo do dashboard representa o fluxo registrado, não o saldo bancário disponível.

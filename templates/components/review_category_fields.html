@@ -1,0 +1,20 @@
+<div class="field">
+  <label for="category-{{ field_key }}">Categoria</label>
+  <select class="select" id="category-{{ field_key }}" name="category" required>
+    <option value="">Selecione uma categoria</option>
+    {% for category in categories_options %}
+      <option value="{{ category }}"
+              {% if item.category == category %}selected{% endif %}>{{ category }}</option>
+    {% endfor %}
+  </select>
+</div>
+<div class="field">
+  <label for="vehicle-{{ field_key }}">Veículo, para IPVA, seguro ou combustível</label>
+  <select class="select" id="vehicle-{{ field_key }}" name="vehicle">
+    <option value="">Sem veículo</option>
+    {% for vehicle in vehicles_options %}
+      <option value="{{ vehicle.pk }}"
+              {% if item.vehicle_id == vehicle.pk %}selected{% endif %}>{{ vehicle.name }}</option>
+    {% endfor %}
+  </select>
+</div>

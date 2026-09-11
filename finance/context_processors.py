@@ -18,7 +18,11 @@ def navigation(request):
         from .forms import CATEGORIES
 
         prefs = Preferences.objects.filter(owner=request.user).first()
-        pending = Transaction.objects.filter(owner=request.user, status="pending").order_by("date")
+        pending = (
+            Transaction.objects.for_totals()
+            .filter(owner=request.user, status="pending")
+            .order_by("date")
+        )
         context.update(
             vehicles_options=PortfolioItem.objects.filter(owner=request.user, kind="vehicles"),
             vehicle_categories=VEHICLE_CATEGORIES,

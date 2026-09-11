@@ -11,7 +11,8 @@ from django.db import transaction
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 
-from .models import BankAccount, BankConnection, OpenFinanceIdentity, Transaction
+from .models import BankAccount, BankConnection, OpenFinanceIdentity, Transaction, CategoryRule
+from .review_services import import_category
 from .pluggy import PluggyClient, PluggyError
 
 
@@ -148,6 +149,7 @@ def sync_connection(connection_id, lease, client=None):
             or lease <= timezone.now()
         ):
             return
+        rules = list(CategoryRule.objects.filter(owner_id=connection.owner_id))
         for row, external_id, entries in snapshot:
             account, _ = BankAccount.objects.get_or_create(
                 external_id=external_id,
@@ -174,6 +176,7 @@ def sync_connection(connection_id, lease, client=None):
                     or existing.bank_account_id != account.pk
                 ):
                     raise PluggyError("Esta movimentação já pertence a outra conta.")
+                values.update(import_category(values, existing, rules))
                 Transaction.objects.update_or_create(pluggy_id=remote_id, defaults=values)
                 seen.add(remote_id)
             # Reconcile removals/changed IDs only inside the fully fetched date window.

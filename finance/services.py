@@ -50,7 +50,7 @@ def category_totals(queryset):
 
 def dashboard_data(user, month=None):
     start, end = month_bounds(month)
-    records = Transaction.objects.filter(owner=user).select_related("vehicle")
+    records = Transaction.objects.for_totals().filter(owner=user).select_related("vehicle")
     selected = records.filter(date__range=(start, end))
     paid = selected.filter(status="paid")
     income, expense = total(paid.filter(kind="income")), total(paid.filter(kind="expense"))

@@ -26,6 +26,9 @@
               <div>
                 {{ item.description }}
                 <p>{{ item.account }}</p>
+                {% if item.review_role != 'normal' %}
+                  <span class="badge badge-neutral">{{ item.get_review_role_display }} · fora dos totais</span>
+                {% endif %}
                 {% if item.vehicle %}
                   <p>
                     <i class="fa-solid fa-car-side" aria-hidden="true"></i> {{ item.vehicle.name }}
@@ -53,8 +56,8 @@
             <td>
               {% if item.pluggy_id %}
                 <a class="badge badge-neutral"
-                   href="{% url 'open_finance' %}"
-                   title="Atualizada pela instituição">Open Finance</a>
+                   href="{% url 'review' %}?state=all&amp;q={{ item.description|urlencode }}"
+                   title="Revisar categoria sem alterar os dados bancários">Open Finance · Revisar</a>
               {% else %}
                 <div class="row-actions">
                   <button class="icon-button"

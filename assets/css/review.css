@@ -1,0 +1,72 @@
+.review-tabs,
+.review-filters,
+.review-pagination {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 24px;
+}
+.review-tabs .button {
+  white-space: normal;
+}
+.review-filters {
+  align-items: flex-end;
+}
+.review-filters .field {
+  flex: 1 1 180px;
+}
+.review-card p {
+  margin: 8px 0;
+  line-height: 1.7;
+}
+.review-card h2,
+.review-pair h3 {
+  overflow-wrap: anywhere;
+}
+.review-card .card-heading,
+.review-card .form-actions {
+  flex-wrap: wrap;
+}
+.review-rule-option {
+  margin-top: 18px;
+}
+.review-rule-option summary,
+.review-card details summary {
+  cursor: pointer;
+  margin-bottom: 12px;
+}
+.review-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  font-size: 12px;
+}
+.review-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+.review-pair > div {
+  border: 1px solid var(--border);
+  padding: 18px;
+  border-radius: 10px;
+  min-width: 0;
+}
+.review-pair h3 {
+  margin-top: 10px;
+}
+.review-pagination {
+  justify-content: center;
+  margin-top: 24px;
+}
+@media (max-width: 700px) {
+  .review-pair {
+    grid-template-columns: 1fr;
+  }
+  .review-card .card-heading {
+    align-items: flex-start;
+  }
+}

@@ -1,0 +1,355 @@
+{% extends 'base.html' %}
+{% load static finance_tags %}
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/review.css' %}">
+{% endblock %}
+{% block content %}
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">CADA LANÇAMENTO NO LUGAR CERTO</p>
+      <h1>Revisar movimentações</h1>
+      <p class="page-subtitle">Organize categorias e confirme o que deve entrar nos seus totais.</p>
+    </div>
+    <a class="button" href="{% url 'transactions' %}">Ver transações</a>
+  </div>
+  <nav class="review-tabs" aria-label="Etapas de revisão">
+    <a class="button {% if tab == 'categories' %}button-primary{% endif %}"
+       href="?tab=categories"
+       {% if tab == 'categories' %}aria-current="page"{% endif %}>Categorias <span class="badge badge-neutral">{{ pending_review_count }}</span></a>
+    <a class="button {% if tab == 'matches' %}button-primary{% endif %}"
+       href="?tab=matches"
+       {% if tab == 'matches' %}aria-current="page"{% endif %}>Possíveis duplicatas e transferências</a>
+    <a class="button {% if tab == 'decisions' %}button-primary{% endif %}"
+       href="?tab=decisions"
+       {% if tab == 'decisions' %}aria-current="page"{% endif %}>Decisões</a>
+    <a class="button {% if tab == 'rules' %}button-primary{% endif %}"
+       href="?tab=rules"
+       {% if tab == 'rules' %}aria-current="page"{% endif %}>Regras automáticas</a>
+  </nav>
+  {% if review_error %}<div class="error-summary" role="alert">{{ review_error }}</div>{% endif %}
+  {% if tab == 'categories' or tab == 'matches' %}
+    <form class="review-filters" method="get">
+      <input type="hidden" name="tab" value="{{ tab }}">
+      <div class="field">
+        <label for="review-search">Descrição</label>
+        <input class="input"
+               id="review-search"
+               name="q"
+               value="{{ request.GET.q }}"
+               maxlength="120"
+               placeholder="Buscar movimentação">
+      </div>
+      <div class="field">
+        <label for="review-month">Mês</label>
+        <input class="input"
+               type="month"
+               id="review-month"
+               name="month"
+               value="{{ request.GET.month }}">
+      </div>
+      {% if tab == 'categories' %}
+        <div class="field">
+          <label for="review-state">Exibir</label>
+          <select class="select" id="review-state" name="state">
+            <option value="pending">A revisar</option>
+            <option value="all" {% if request.GET.state == 'all' %}selected{% endif %}>Todas as categorias</option>
+          </select>
+        </div>
+      {% endif %}
+      <button class="button" type="submit">Filtrar</button>
+    </form>
+  {% endif %}
+  <div class="stack">
+    {% if tab == 'categories' %}
+      <p class="small muted">
+        Suas categorias e vínculos com veículos serão preservados na sincronização. Valor, data e descrição bancária continuam sendo atualizados pela instituição.
+      </p>
+      {% for item in page_obj %}
+        <section class="card review-card">
+          <div class="card-heading">
+            <div>
+              <h2>{{ item.description }}</h2>
+              {% if item.review_role != 'normal' %}
+                <span class="badge badge-neutral">{{ item.get_review_role_display }} · fora dos totais</span>
+              {% endif %}
+              <p class="small muted">{{ item.account }} · {{ item.date|date:'d/m/Y' }} · {{ item.get_status_display }}</p>
+            </div>
+            <strong class="mono amount-{{ item.kind }}" data-money>{{ item.get_kind_display }} · R$ {{ item.amount|money }}</strong>
+          </div>
+          <form action="{% url 'review_action' %}?{{ query_params }}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="category">
+            <input type="hidden" name="transaction_id" value="{{ item.pk }}">
+            <input type="hidden" name="version" value="{{ item.review_version }}">
+            <div class="form-grid">{% include 'components/review_category_fields.html' with field_key=item.pk %}</div>
+            <details class="review-rule-option">
+              <summary>Criar uma regra para descrições semelhantes</summary>
+              <div class="field">
+                <label for="rule-pattern-{{ item.pk }}">Texto que a descrição deve conter</label>
+                <input class="input"
+                       id="rule-pattern-{{ item.pk }}"
+                       name="pattern"
+                       maxlength="120"
+                       placeholder="Ex.: netflix">
+              </div>
+              <label class="review-checkbox">
+                <input type="checkbox" name="create_rule" value="1">
+                Aplicar esta categoria às {{ item.get_kind_display|lower }}s que contêm esse texto
+              </label>
+              <p class="small muted">
+                Aplica aos registros atuais sem categoria personalizada e às próximas importações do mesmo tipo.
+              </p>
+            </details>
+            <div class="form-actions">
+              <span class="small muted">
+                {% if item.category_locked %}
+                  Categoria personalizada
+                {% elif item.reviewed_at %}
+                  Revisada
+                {% else %}
+                  A revisar
+                {% endif %}
+              </span>
+              <button class="button button-primary" type="submit">Salvar e marcar como revisada</button>
+            </div>
+          </form>
+        </section>
+      {% empty %}
+        <section class="card empty-state">
+          <i class="fa-solid fa-check" aria-hidden="true"></i>
+          <h2>Nenhuma movimentação a revisar neste filtro</h2>
+          <p>
+            Novas importações aparecerão aqui. Para alterar uma categoria já revisada, selecione “Todas as categorias”.
+          </p>
+        </section>
+      {% endfor %}
+    {% elif tab == 'matches' %}
+      <section class="card">
+        <h2>Confira antes de conciliar</h2>
+        <p class="small muted">
+          As sugestões comparam valores iguais e datas com até três dias de diferença. Uma semelhança não comprova que os lançamentos estão relacionados.
+        </p>
+        <p class="small muted">
+          Duplicatas ligam um registro manual a um importado. Transferências ligam uma saída e uma entrada concluídas em duas contas bancárias suas. Nada é excluído automaticamente.
+        </p>
+      </section>
+      {% for suggestion in suggestions %}
+        <section class="card review-card">
+          <div class="card-heading">
+            <h2>
+              {% if suggestion.kind == 'duplicate' %}
+                Possível duplicata
+              {% else %}
+                Possível transferência interna
+              {% endif %}
+            </h2>
+            <span class="badge badge-warning">Sua confirmação é necessária</span>
+          </div>
+          <div class="review-pair">
+            <div>
+              <span class="badge badge-neutral">
+                {% if suggestion.kind == 'duplicate' %}
+                  Lançamento manual
+                {% else %}
+                  Saída
+                {% endif %}
+              </span>
+              <h3>{{ suggestion.first.description }}</h3>
+              <p class="small muted">
+                {{ suggestion.first.account }} · {{ suggestion.first.date|date:'d/m/Y' }} · {{ suggestion.first.get_status_display }}
+              </p>
+              <strong class="mono" data-money>R$ {{ suggestion.first.amount|money }}</strong>
+            </div>
+            <div>
+              <span class="badge badge-neutral">
+                {% if suggestion.kind == 'duplicate' %}
+                  Lançamento importado
+                {% else %}
+                  Entrada
+                {% endif %}
+              </span>
+              <h3>{{ suggestion.second.description }}</h3>
+              <p class="small muted">
+                {{ suggestion.second.account }} · {{ suggestion.second.date|date:'d/m/Y' }} · {{ suggestion.second.get_status_display }}
+              </p>
+              <strong class="mono" data-money>R$ {{ suggestion.second.amount|money }}</strong>
+            </div>
+          </div>
+          <p class="small muted">
+            {% if suggestion.kind == 'duplicate' %}
+              Ao confirmar, o lançamento manual ficará fora dos totais. O importado será a referência. Ambos permanecem no histórico.
+            {% else %}
+              Confirme somente se o dinheiro foi transferido entre suas próprias contas. Os dois lançamentos ficarão fora dos totais de receitas e despesas.
+            {% endif %}
+            Você pode desfazer em Decisões.
+          </p>
+          <form class="form-actions"
+                action="{% url 'review_action' %}?tab=matches"
+                method="post">
+            {% csrf_token %}
+            <input type="hidden" name="first_id" value="{{ suggestion.first.pk }}">
+            <input type="hidden" name="second_id" value="{{ suggestion.second.pk }}">
+            <input type="hidden" name="kind" value="{{ suggestion.kind }}">
+            <input type="hidden"
+                   name="first_version"
+                   value="{{ suggestion.first.review_version }}">
+            <input type="hidden"
+                   name="second_version"
+                   value="{{ suggestion.second.review_version }}">
+            <button class="button" name="action" value="dismiss">Não estão relacionados</button>
+            <button class="button button-primary" name="action" value="confirm">
+              {% if suggestion.kind == 'duplicate' %}
+                Confirmar duplicata
+              {% else %}
+                Confirmar transferência interna
+              {% endif %}
+            </button>
+          </form>
+        </section>
+      {% empty %}
+        <section class="card empty-state">
+          <h2>Nenhuma correspondência nesta página</h2>
+          <p>Avance para analisar os próximos lançamentos ou ajuste os filtros.</p>
+        </section>
+      {% endfor %}
+      {% if dismissed_count %}
+        <form method="post" action="{% url 'review_action' %}?tab=matches">
+          {% csrf_token %}
+          <button class="button" name="action" value="restore_suggestions">
+            Reexibir {{ dismissed_count }} sugestões descartadas
+          </button>
+        </form>
+      {% endif %}
+    {% elif tab == 'decisions' %}
+      <p class="small muted">
+        Se o banco alterar valor, data, tipo, status, descrição ou conta de um lançamento, a conciliação será desfeita e ficará disponível para nova revisão.
+      </p>
+      {% for pair in page_obj %}
+        <section class="card review-card">
+          <div class="card-heading">
+            <h2>{{ pair.get_kind_display }}</h2>
+            <span class="small subtle">{{ pair.created_at|date:'d/m/Y H:i' }}</span>
+          </div>
+          <p>{{ pair.first.description }} · {{ pair.first.account }}</p>
+          <p>{{ pair.second.description }} · {{ pair.second.account }}</p>
+          <strong class="mono" data-money>R$ {{ pair.first.amount|money }}</strong>
+          <form class="form-actions"
+                method="post"
+                action="{% url 'review_action' %}?tab=decisions">
+            {% csrf_token %}
+            <input type="hidden" name="pair_id" value="{{ pair.pk }}">
+            <button class="button" name="action" value="undo">Desfazer conciliação</button>
+          </form>
+        </section>
+      {% empty %}
+        <section class="card empty-state">
+          <h2>Nenhuma conciliação confirmada</h2>
+          <p>Suas decisões aparecerão aqui, com a opção de desfazer.</p>
+        </section>
+      {% endfor %}
+    {% else %}
+      <section class="card review-card">
+        <h2>Nova regra</h2>
+        <p class="small muted">
+          O texto é comparado sem diferenciar maiúsculas e acentos. Se várias regras combinarem, a criada mais recentemente tem prioridade. Categorias personalizadas são preservadas.
+        </p>
+        <form action="{% url 'review_action' %}?tab=rules" method="post">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="rule">
+          <div class="form-grid">
+            <div class="field">
+              <label for="new-pattern">Descrição contém</label>
+              <input class="input"
+                     id="new-pattern"
+                     name="pattern"
+                     placeholder="Ex.: netflix"
+                     minlength="2"
+                     maxlength="120"
+                     required>
+            </div>
+            <div class="field">
+              <label for="new-kind">Tipo</label>
+              <select class="select" id="new-kind" name="kind">
+                <option value="expense">Despesa</option>
+                <option value="income">Receita</option>
+              </select>
+            </div>
+            {% include 'components/review_category_fields.html' with field_key='new-rule' item=None %}
+          </div>
+          <div class="form-actions">
+            <button class="button button-primary">Criar regra e aplicar</button>
+          </div>
+        </form>
+      </section>
+      {% for item in page_obj %}
+        <section class="card review-card">
+          <div class="card-heading">
+            <div>
+              <h2>“{{ item.match_text }}” → {{ item.category }}</h2>
+              <p class="small muted">
+                {{ item.get_kind_display }}
+                {% if item.vehicle %}· {{ item.vehicle.name }}{% endif %}
+              </p>
+            </div>
+          </div>
+          <details>
+            <summary class="text-link">Editar regra</summary>
+            <form action="{% url 'review_action' %}?tab=rules" method="post">
+              {% csrf_token %}
+              <input type="hidden" name="action" value="rule">
+              <input type="hidden" name="rule_id" value="{{ item.pk }}">
+              <div class="form-grid">
+                <div class="field">
+                  <label for="pattern-{{ item.pk }}">Descrição contém</label>
+                  <input class="input"
+                         id="pattern-{{ item.pk }}"
+                         name="pattern"
+                         value="{{ item.match_text }}"
+                         minlength="2"
+                         maxlength="120"
+                         required>
+                </div>
+                <div class="field">
+                  <label for="kind-{{ item.pk }}">Tipo</label>
+                  <select class="select" name="kind" id="kind-{{ item.pk }}">
+                    <option value="expense" {% if item.kind == 'expense' %}selected{% endif %}>Despesa</option>
+                    <option value="income" {% if item.kind == 'income' %}selected{% endif %}>Receita</option>
+                  </select>
+                </div>
+                {% include 'components/review_category_fields.html' with field_key=item.pk %}
+              </div>
+              <div class="form-actions">
+                <button class="button button-primary">Salvar e aplicar</button>
+              </div>
+            </form>
+          </details>
+          <form class="form-actions"
+                method="post"
+                action="{% url 'review_action' %}?tab=rules">
+            {% csrf_token %}
+            <input type="hidden" name="rule_id" value="{{ item.pk }}">
+            <span class="small muted">Remover a regra preserva as categorias já atribuídas.</span>
+            <button class="button" name="action" value="delete_rule">Remover regra</button>
+          </form>
+        </section>
+      {% empty %}
+        <p class="small muted">Você ainda não criou regras automáticas.</p>
+      {% endfor %}
+    {% endif %}
+    {% if page_obj.paginator.num_pages > 1 %}
+      <nav class="review-pagination" aria-label="Paginação da revisão">
+        {% if page_obj.has_previous %}
+          <a class="button"
+             href="?{{ query_params }}&amp;page={{ page_obj.previous_page_number }}">Anterior</a>
+        {% endif %}
+        <span class="small muted">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+          {% if tab == 'matches' %}de lançamentos analisados{% endif %}
+        </span>
+        {% if page_obj.has_next %}
+          <a class="button"
+             href="?{{ query_params }}&amp;page={{ page_obj.next_page_number }}">Próxima</a>
+        {% endif %}
+      </nav>
+    {% endif %}
+  </div>
+{% endblock %}

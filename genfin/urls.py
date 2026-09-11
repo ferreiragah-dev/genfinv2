@@ -3,6 +3,7 @@ from django.contrib.auth.views import LogoutView
 from django.urls import path
 from finance import views
 from finance import open_finance_views
+from finance import review_views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -13,6 +14,8 @@ urlpatterns = [
     path("demo/", views.demo, name="demo"),
     path("landing/", views.landing, name="landing"),
     path("transactions/", views.transactions, name="transactions"),
+    path("review/", review_views.index, name="review"),
+    path("review/action/", review_views.action, name="review_action"),
     path("profile/", views.profile, name="profile"),
     path("profile/reset/", views.account_reset, name="account_reset"),
     path("open-finance/", open_finance_views.index, name="open_finance"),

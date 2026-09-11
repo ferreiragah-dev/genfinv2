@@ -48,6 +48,7 @@ Esse modo explícito usa SQLite em `preview.sqlite3`, somente para desenvolvimen
 - Login, cadastro, logout via POST, perfil editável e landing page.
 - Em Meu Perfil, **Resetar conta** exige a senha atual, desconecta as instituições da Pluggy e apaga transações, importações, cartões, veículos, viagens, receitas/despesas fixas, reservas, metas e preferências do dashboard. O perfil e o acesso são preservados. A exclusão é permanente; se a desconexão remota falhar, os dados locais são preservados para uma nova tentativa.
 - Criação, edição, exclusão, busca, filtros, paginação e exportação CSV de transações.
+- Tela **Revisar movimentações** com categorias persistentes, regras por descrição, sugestões de duplicatas e transferências internas, confirmação e opção de desfazer. Veja o [guia de revisão](docs/review.md).
 - Cadastro, edição e exclusão de cartões, veículos, viagens, despesas fixas, receitas fixas e reservas.
 - Feedback de sucesso/erro, validação no navegador e servidor, estados vazios, modais nativos, drawer, busca rápida `Ctrl/Cmd+K` e opção local de ocultar valores.
 - Layouts CSS para desktop, notebook, tablet e celular; navegação móvel com controle de foco; respeito a movimento reduzido.
@@ -77,6 +78,7 @@ docs/                    Arquitetura e Design System
 ## Regras financeiras
 
 - **Saldo do mês:** receitas concluídas menos despesas concluídas no período selecionado.
+- **Conciliação:** duplicatas manuais confirmadas e as duas pontas de transferências internas confirmadas ficam fora dos cálculos, incluindo dashboard, notificações e custos de veículos. Os registros continuam no histórico e no CSV, com indicação de conciliação. Desfazer uma decisão restaura a contagem conforme as demais decisões existentes.
 - **Patrimônio líquido:** saldo acumulado até o final do período + reservas externas + valores estimados dos veículos − faturas cadastradas. Bens, reservas e faturas usam seus valores atuais; não há snapshots históricos desses registros.
 - **Reservas:** saldos mantidos fora da conta de movimentações. Não cadastre o mesmo dinheiro como receita e como reserva externa para evitar dupla contagem.
 - **Viagens:** orçamento de planejamento; não entra novamente no patrimônio.

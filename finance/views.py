@@ -5,6 +5,9 @@ import json
 from decimal import Decimal
 from django.contrib import messages
 from django.contrib.auth import login
+from django.contrib.auth import get_user_model
+from django.db import transaction as db_transaction
+from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
 from django.core.paginator import Paginator
@@ -153,9 +156,9 @@ def transactions(request):
             "page_obj": page_obj,
             "recent": page_obj,
             "count": rows.count(),
-            "income": total(rows.filter(kind="income", status="paid")),
-            "expense": total(rows.filter(kind="expense", status="paid")),
-            "pending_total": total(rows.filter(status="pending")),
+            "income": total(rows.for_totals().filter(kind="income", status="paid")),
+            "expense": total(rows.for_totals().filter(kind="expense", status="paid")),
+            "pending_total": total(rows.for_totals().filter(status="pending")),
             "categories_options": CATEGORIES,
             "query_params": params.urlencode(),
             "editable": True,
@@ -288,7 +291,9 @@ def transaction_detail(request, pk):
 
 @login_required
 @require_POST
+@db_transaction.atomic
 def transaction_save(request, pk=None):
+    get_user_model().objects.select_for_update().get(pk=request.user.pk)
     instance = get_object_or_404(Transaction, pk=pk, owner=request.user) if pk else None
     if instance and instance.pluggy_id:
         return JsonResponse(
@@ -299,6 +304,8 @@ def transaction_save(request, pk=None):
         return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
     obj = form.save(commit=False)
     obj.owner = request.user
+    obj.category_locked = True
+    obj.reviewed_at = timezone.now()
     obj.save()
     return JsonResponse(
         {"message": "Transação atualizada." if pk else "Transação adicionada.", "id": obj.id}
@@ -307,7 +314,9 @@ def transaction_save(request, pk=None):
 
 @login_required
 @require_POST
+@db_transaction.atomic
 def transaction_delete(request, pk):
+    get_user_model().objects.select_for_update().get(pk=request.user.pk)
     instance = get_object_or_404(Transaction, pk=pk, owner=request.user)
     if instance.pluggy_id:
         return JsonResponse(
@@ -337,7 +346,9 @@ def portfolio_detail(request, pk):
 
 @login_required
 @require_POST
+@db_transaction.atomic
 def portfolio_save(request, pk=None):
+    get_user_model().objects.select_for_update().get(pk=request.user.pk)
     instance = get_object_or_404(PortfolioItem, pk=pk, owner=request.user) if pk else None
     form = PortfolioForm(request.POST, instance=instance)
     if not form.is_valid():
@@ -350,7 +361,9 @@ def portfolio_save(request, pk=None):
 
 @login_required
 @require_POST
+@db_transaction.atomic
 def portfolio_delete(request, pk):
+    get_user_model().objects.select_for_update().get(pk=request.user.pk)
     get_object_or_404(PortfolioItem, pk=pk, owner=request.user).delete()
     return JsonResponse({"message": "Registro excluído."})
 
@@ -393,7 +406,17 @@ def export_transactions(request):
     response.write("\ufeff")
     writer = csv.writer(response, delimiter=";")
     writer.writerow(
-        ["Descrição", "Tipo", "Categoria", "Valor (BRL)", "Data", "Status", "Conta", "Veículo"]
+        [
+            "Descrição",
+            "Tipo",
+            "Categoria",
+            "Valor (BRL)",
+            "Data",
+            "Status",
+            "Conta",
+            "Veículo",
+            "Conciliação",
+        ]
     )
 
     def safe(value):
@@ -411,6 +434,7 @@ def export_transactions(request):
                 row.get_status_display(),
                 safe(row.account),
                 safe(row.vehicle.name) if row.vehicle else "",
+                row.get_review_role_display(),
             ]
         )
     return response

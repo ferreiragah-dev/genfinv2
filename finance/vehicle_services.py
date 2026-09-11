@@ -9,14 +9,18 @@ from .services import ZERO, MONTHS, month_bounds
 def vehicle_month_data(user, month, vehicles):
     start, end = month_bounds(month)
     items = list(vehicles)
-    history = Transaction.objects.filter(
-        owner=user,
-        vehicle__owner=user,
-        vehicle__kind="vehicles",
-        kind="expense",
-        category__in=VEHICLE_CATEGORIES,
-        date__range=(start, end),
-    ).select_related("vehicle")
+    history = (
+        Transaction.objects.for_totals()
+        .filter(
+            owner=user,
+            vehicle__owner=user,
+            vehicle__kind="vehicles",
+            kind="expense",
+            category__in=VEHICLE_CATEGORIES,
+            date__range=(start, end),
+        )
+        .select_related("vehicle")
+    )
     grouped = (
         history.filter(status="paid")
         .values("vehicle_id", "category")
